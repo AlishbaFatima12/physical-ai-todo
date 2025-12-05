@@ -16,7 +16,6 @@ print("-" * 70)
 tasks_to_add = [
     ("Buy groceries", "Milk, eggs, bread, coffee"),
     ("Call mom", "Discuss weekend plans"),
-    ("Exercise", "30 min cardio"),
     ("Write report", "Q4 financial summary"),
     ("Book dentist appointment", "")
 ]
