@@ -17,7 +17,8 @@ tasks_to_add = [
     ("Buy groceries", "Milk, eggs, bread, coffee"),
     ("Call mom", "Discuss weekend plans"),
     ("Write report", "Q4 financial summary"),
-    ("Book dentist appointment", "")
+    ("Book dentist appointment", ""),
+    ("Exercise", "30 min morning jog")
 ]
 
 for i, (title, desc) in enumerate(tasks_to_add, 1):
