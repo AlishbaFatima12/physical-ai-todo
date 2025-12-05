@@ -1,0 +1,8 @@
+# Phase I: No external dependencies (standard library only)
+# argparse, unittest, datetime are built-in
+
+# Phase II will add:
+# sqlmodel
+# fastapi
+# psycopg2-binary
+# etc.
