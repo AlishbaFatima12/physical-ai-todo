@@ -3,7 +3,35 @@
 ## Location
 Your project is at: `C:\Users\Ahsan\physical-ai-todo`
 
-## Method 1: Quick CLI Testing (Separate Commands)
+## Method 1: Interactive Demo (BEST FOR PHASE 1 SUBMISSION!)
+
+**The easiest and most interactive way to test all 5 CRUD operations!**
+
+### Open PowerShell or CMD:
+```bash
+cd C:\Users\Ahsan\physical-ai-todo
+python interactive_demo.py
+```
+
+### What you'll see:
+- Interactive menu with 6 options
+- Add, List, Mark Complete, Update, Delete tasks
+- Data persists within the session
+- Perfect for demonstrating Phase I functionality!
+
+### Menu Options:
+1. **Add a new task** - Create tasks with title and description
+2. **List all tasks** - See all tasks with completion status
+3. **Mark task as complete/incomplete** - Toggle task completion
+4. **Update a task** - Modify title or description
+5. **Delete a task** - Remove tasks (with confirmation)
+6. **Exit** - Close the application
+
+**This is the recommended method for Phase I submission and demonstration!**
+
+---
+
+## Method 2: Quick CLI Testing (Separate Commands)
 
 ### Open PowerShell or CMD and navigate to project:
 ```bash
@@ -39,7 +67,7 @@ python -m src.todo.app add --help
 
 ---
 
-## Method 2: Interactive Python Session (Recommended!)
+## Method 3: Interactive Python Session
 
 This keeps data in memory during your session.
 
@@ -101,22 +129,19 @@ print(f"\nTotal: {len(tasks)} tasks")
 
 ---
 
-## Method 3: Run the Test Script
+## Method 4: Run the Quick Demo Script
 
-### Quick automated test:
+### Automated demonstration of all features:
 ```bash
 cd C:\Users\Ahsan\physical-ai-todo
-bash test_session.sh
+python quick_demo.py
 ```
 
-Or on Windows without bash:
-```bash
-python -c "exec(open('test_session.sh').read().replace('#!/bin/bash','').replace('echo','print'))"
-```
+This script automatically demonstrates all 5 CRUD operations.
 
 ---
 
-## Method 4: Run the Test Suite
+## Method 5: Run the Test Suite
 
 ### See all 19 tests pass:
 ```bash
@@ -128,7 +153,7 @@ python -m unittest discover tests -v
 
 ---
 
-## Method 5: Create a Python Script
+## Method 6: Create Your Own Test Script
 
 ### Create `my_test.py`:
 ```python
