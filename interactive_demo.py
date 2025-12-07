@@ -49,20 +49,20 @@ def add_task_interactive():
 
     title = input("\n  Enter task title: ").strip()
     if not title:
-        print("  ❌ Error: Title cannot be empty!")
+        print("  [ERROR] Error: Title cannot be empty!")
         return
 
     description = input("  Enter description (optional, press Enter to skip): ").strip()
 
     try:
         task = storage.add_task(title, description)
-        print(f"\n  ✅ Task created successfully!")
+        print(f"\n  [OK] Task created successfully!")
         print(f"  ID: {task['id']}")
         print(f"  Title: {task['title']}")
         if task['description']:
             print(f"  Description: {task['description']}")
     except ValueError as e:
-        print(f"  ❌ Error: {e}")
+        print(f"  [ERROR] Error: {e}")
 
 def list_tasks_interactive():
     """Interactive task listing"""
@@ -99,11 +99,11 @@ def mark_complete_interactive():
             new_status = not task['completed']
             storage.mark_complete(task_id, new_status)
             status_text = "complete" if new_status else "incomplete"
-            print(f"\n  ✅ Task [{task_id}] marked as {status_text}!")
+            print(f"\n  [OK] Task [{task_id}] marked as {status_text}!")
         else:
-            print(f"\n  ❌ Error: Task with ID {task_id} not found!")
+            print(f"\n  [ERROR] Error: Task with ID {task_id} not found!")
     except ValueError:
-        print("\n  ❌ Error: Please enter a valid task ID (number)!")
+        print("\n  [ERROR] Error: Please enter a valid task ID (number)!")
 
 def update_task_interactive():
     """Interactive task update"""
@@ -124,7 +124,7 @@ def update_task_interactive():
         task = storage.get_task(task_id)
 
         if not task:
-            print(f"\n  ❌ Error: Task with ID {task_id} not found!")
+            print(f"\n  [ERROR] Error: Task with ID {task_id} not found!")
             return
 
         print(f"\n  Current task:")
@@ -140,17 +140,17 @@ def update_task_interactive():
         final_desc = new_desc if new_desc else task['description']
 
         updated_task = storage.update_task(task_id, title=final_title, description=final_desc)
-        print(f"\n  ✅ Task updated successfully!")
+        print(f"\n  [OK] Task updated successfully!")
         print(f"  Title: {updated_task['title']}")
         print(f"  Description: {updated_task['description']}")
 
     except ValueError as e:
         if "not found" in str(e):
-            print(f"\n  ❌ Error: Task not found!")
+            print(f"\n  [ERROR] Error: Task not found!")
         elif "Task ID must be a number" in str(e):
-            print("\n  ❌ Error: Please enter a valid task ID (number)!")
+            print("\n  [ERROR] Error: Please enter a valid task ID (number)!")
         else:
-            print(f"\n  ❌ Error: {e}")
+            print(f"\n  [ERROR] Error: {e}")
 
 def delete_task_interactive():
     """Interactive task deletion"""
@@ -171,7 +171,7 @@ def delete_task_interactive():
         task = storage.get_task(task_id)
 
         if not task:
-            print(f"\n  ❌ Error: Task with ID {task_id} not found!")
+            print(f"\n  [ERROR] Error: Task with ID {task_id} not found!")
             return
 
         # Confirm deletion
@@ -179,13 +179,13 @@ def delete_task_interactive():
 
         if confirm in ['yes', 'y']:
             deleted_task = storage.delete_task(task_id)
-            print(f"\n  ✅ Task deleted successfully!")
+            print(f"\n  [OK] Task deleted successfully!")
             print(f"  Deleted: [{deleted_task['id']}] {deleted_task['title']}")
         else:
-            print("\n  ❌ Deletion cancelled.")
+            print("\n  [ERROR] Deletion cancelled.")
 
     except ValueError:
-        print("\n  ❌ Error: Please enter a valid task ID (number)!")
+        print("\n  [ERROR] Error: Please enter a valid task ID (number)!")
 
 def main():
     """Main interactive loop"""
@@ -216,7 +216,7 @@ def main():
             print()
             sys.exit(0)
         else:
-            print("\n  ❌ Invalid choice! Please enter a number between 1 and 6.")
+            print("\n  [ERROR] Invalid choice! Please enter a number between 1 and 6.")
 
         # Pause before showing menu again
         input("\n  Press Enter to continue...")
