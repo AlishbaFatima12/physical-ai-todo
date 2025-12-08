@@ -9,14 +9,13 @@ from datetime import datetime
 from typing import List, Optional, Tuple
 
 from sqlalchemy import select, func, or_
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import col
+from sqlmodel import Session, col
 
 from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate, TaskPatch
 
 
-async def create_task(task_data: TaskCreate, session: AsyncSession) -> Task:
+def create_task(task_data: TaskCreate, session: Session) -> Task:
     """
     Create a new task in the database.
 
@@ -42,14 +41,14 @@ async def create_task(task_data: TaskCreate, session: AsyncSession) -> Task:
     )
 
     session.add(db_task)
-    await session.commit()
-    await session.refresh(db_task)
+    session.commit()
+    session.refresh(db_task)
 
     return db_task
 
 
-async def list_tasks(
-    session: AsyncSession,
+def list_tasks(
+    session: Session,
     limit: int = 50,
     offset: int = 0,
     search: Optional[str] = None,
@@ -103,7 +102,7 @@ async def list_tasks(
 
     # Get total count before pagination
     count_query = select(func.count()).select_from(query.subquery())
-    result = await session.execute(count_query)
+    result = session.execute(count_query)
     total = result.scalar_one()
 
     # Apply sorting
@@ -117,13 +116,13 @@ async def list_tasks(
     query = query.limit(limit).offset(offset)
 
     # Execute query
-    result = await session.execute(query)
+    result = session.execute(query)
     tasks = result.scalars().all()
 
     return list(tasks), total
 
 
-async def get_task(task_id: int, session: AsyncSession) -> Optional[Task]:
+def get_task(task_id: int, session: Session) -> Optional[Task]:
     """
     Get a single task by ID.
 
@@ -134,11 +133,11 @@ async def get_task(task_id: int, session: AsyncSession) -> Optional[Task]:
     Returns:
         Task object if found, None otherwise
     """
-    result = await session.execute(select(Task).where(Task.id == task_id))
+    result = session.execute(select(Task).where(Task.id == task_id))
     return result.scalar_one_or_none()
 
 
-async def update_task(task_id: int, task_data: TaskUpdate, session: AsyncSession) -> Optional[Task]:
+def update_task(task_id: int, task_data: TaskUpdate, session: Session) -> Optional[Task]:
     """
     Update a task with full replacement (PUT).
 
@@ -150,7 +149,7 @@ async def update_task(task_id: int, task_data: TaskUpdate, session: AsyncSession
     Returns:
         Updated Task object if found, None otherwise
     """
-    db_task = await get_task(task_id, session)
+    db_task = get_task(task_id, session)
     if not db_task:
         return None
 
@@ -163,13 +162,13 @@ async def update_task(task_id: int, task_data: TaskUpdate, session: AsyncSession
     db_task.updated_at = datetime.utcnow()
 
     session.add(db_task)
-    await session.commit()
-    await session.refresh(db_task)
+    session.commit()
+    session.refresh(db_task)
 
     return db_task
 
 
-async def patch_task(task_id: int, task_data: TaskPatch, session: AsyncSession) -> Optional[Task]:
+def patch_task(task_id: int, task_data: TaskPatch, session: Session) -> Optional[Task]:
     """
     Partially update a task (PATCH).
 
@@ -181,7 +180,7 @@ async def patch_task(task_id: int, task_data: TaskPatch, session: AsyncSession) 
     Returns:
         Updated Task object if found, None otherwise
     """
-    db_task = await get_task(task_id, session)
+    db_task = get_task(task_id, session)
     if not db_task:
         return None
 
@@ -197,13 +196,13 @@ async def patch_task(task_id: int, task_data: TaskPatch, session: AsyncSession) 
     db_task.updated_at = datetime.utcnow()
 
     session.add(db_task)
-    await session.commit()
-    await session.refresh(db_task)
+    session.commit()
+    session.refresh(db_task)
 
     return db_task
 
 
-async def delete_task(task_id: int, session: AsyncSession) -> bool:
+def delete_task(task_id: int, session: Session) -> bool:
     """
     Delete a task by ID.
 
@@ -214,17 +213,17 @@ async def delete_task(task_id: int, session: AsyncSession) -> bool:
     Returns:
         True if task was deleted, False if not found
     """
-    db_task = await get_task(task_id, session)
+    db_task = get_task(task_id, session)
     if not db_task:
         return False
 
-    await session.delete(db_task)
-    await session.commit()
+    session.delete(db_task)
+    session.commit()
 
     return True
 
 
-async def toggle_complete(task_id: int, session: AsyncSession) -> Optional[Task]:
+def toggle_complete(task_id: int, session: Session) -> Optional[Task]:
     """
     Toggle task completion status.
 
@@ -235,7 +234,7 @@ async def toggle_complete(task_id: int, session: AsyncSession) -> Optional[Task]
     Returns:
         Updated Task object if found, None otherwise
     """
-    db_task = await get_task(task_id, session)
+    db_task = get_task(task_id, session)
     if not db_task:
         return None
 
@@ -243,7 +242,7 @@ async def toggle_complete(task_id: int, session: AsyncSession) -> Optional[Task]
     db_task.updated_at = datetime.utcnow()
 
     session.add(db_task)
-    await session.commit()
-    await session.refresh(db_task)
+    session.commit()
+    session.refresh(db_task)
 
     return db_task

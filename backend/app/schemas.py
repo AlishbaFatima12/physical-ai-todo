@@ -1,186 +1,211 @@
-"""
-Pydantic schemas for request/response validation.
-
-These schemas define the API contract and validate incoming/outgoing data.
-Separate from SQLModel database models for flexibility.
-"""
-
+"""Pydantic schemas for request/response validation"""
+from pydantic import BaseModel, Field
+from typing import Optional, List
 from datetime import datetime
-from typing import List, Optional
-
-from pydantic import BaseModel, Field, field_validator
+from app.models import Priority, ActionType
 
 
-class TaskCreate(BaseModel):
-    """Schema for creating a new task (POST /tasks)"""
+# Task schemas
+class TaskBase(BaseModel):
+    """Base task schema"""
+    title: str = Field(..., max_length=500)
+    description: Optional[str] = Field(None, max_length=5000)
+    priority: Priority = Priority.MEDIUM
+    tags: Optional[List[str]] = []
 
-    title: str = Field(..., min_length=1, max_length=200, description="Task title")
-    description: str = Field(default="", max_length=2000, description="Task description")
-    priority: str = Field(default="medium", pattern="^(high|medium|low)$", description="Priority level")
-    tags: List[str] = Field(default=[], description="List of tags")
 
-    @field_validator("title")
-    @classmethod
-    def title_not_empty(cls, v: str) -> str:
-        """Validate title is not empty or whitespace only"""
-        if not v or not v.strip():
-            raise ValueError("Title cannot be empty")
-        return v.strip()
-
-    @field_validator("priority")
-    @classmethod
-    def validate_priority(cls, v: str) -> str:
-        """Validate priority is one of allowed values"""
-        if v not in ["high", "medium", "low"]:
-            raise ValueError("Priority must be 'high', 'medium', or 'low'")
-        return v
-
-    class Config:
-        """Pydantic configuration"""
-
-        json_schema_extra = {
-            "example": {
-                "title": "Buy groceries",
-                "description": "Milk, eggs, bread",
-                "priority": "high",
-                "tags": ["shopping", "urgent"],
-            }
-        }
+class TaskCreate(TaskBase):
+    """Schema for creating a task"""
+    display_order: Optional[int] = 0
 
 
 class TaskUpdate(BaseModel):
-    """Schema for full task update (PUT /tasks/{id})"""
-
-    title: str = Field(..., min_length=1, max_length=200)
-    description: str = Field(..., max_length=2000)
-    priority: str = Field(..., pattern="^(high|medium|low)$")
-    tags: List[str] = Field(...)
-    completed: bool = Field(...)
-
-    @field_validator("title")
-    @classmethod
-    def title_not_empty(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("Title cannot be empty")
-        return v.strip()
-
-    class Config:
-        """Pydantic configuration"""
-
-        json_schema_extra = {
-            "example": {
-                "title": "Buy groceries and fruits",
-                "description": "Milk, eggs, bread, apples",
-                "priority": "medium",
-                "tags": ["shopping"],
-                "completed": False,
-            }
-        }
+    """Schema for updating a task"""
+    title: Optional[str] = Field(None, max_length=500)
+    description: Optional[str] = Field(None, max_length=5000)
+    completed: Optional[bool] = None
+    priority: Optional[Priority] = None
+    tags: Optional[List[str]] = None
+    display_order: Optional[int] = None
 
 
 class TaskPatch(BaseModel):
-    """Schema for partial task update (PATCH /tasks/{id})"""
-
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
-    description: Optional[str] = Field(None, max_length=2000)
-    priority: Optional[str] = Field(None, pattern="^(high|medium|low)$")
-    tags: Optional[List[str]] = None
+    """Schema for partially updating a task (PATCH)"""
+    title: Optional[str] = Field(None, max_length=500)
+    description: Optional[str] = Field(None, max_length=5000)
     completed: Optional[bool] = None
+    priority: Optional[Priority] = None
+    tags: Optional[List[str]] = None
+    display_order: Optional[int] = None
 
-    @field_validator("title")
-    @classmethod
-    def title_not_empty(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and (not v or not v.strip()):
-            raise ValueError("Title cannot be empty")
-        return v.strip() if v else v
+
+class SubtaskResponse(BaseModel):
+    """Subtask response schema"""
+    id: int
+    task_id: int
+    title: str
+    completed: bool
+    display_order: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        """Pydantic configuration"""
+        from_attributes = True
 
-        json_schema_extra = {"example": {"completed": True}}
+
+class NoteResponse(BaseModel):
+    """Note response schema"""
+    id: int
+    task_id: int
+    content: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AttachmentResponse(BaseModel):
+    """Attachment response schema"""
+    id: int
+    task_id: int
+    filename: str
+    file_url: str
+    file_size: int
+    mime_type: str
+    ocr_text: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ActivityLogResponse(BaseModel):
+    """Activity log response schema"""
+    id: int
+    task_id: int
+    action_type: ActionType
+    field_changed: Optional[str]
+    old_value: Optional[str]
+    new_value: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TaskResponse(TaskBase):
+    """Task response schema with optional relations"""
+    id: int
+    completed: bool
+    display_order: int
+    is_template: bool
+    created_at: datetime
+    updated_at: datetime
+    subtasks: Optional[List[SubtaskResponse]] = None
+    notes: Optional[List[NoteResponse]] = None
+    attachments: Optional[List[AttachmentResponse]] = None
+    activity_logs: Optional[List[ActivityLogResponse]] = None
+
+    class Config:
+        from_attributes = True
 
 
 class TaskRead(BaseModel):
-    """Schema for task response (GET /tasks/{id})"""
-
+    """Task read schema for API responses"""
     id: int
     title: str
-    description: str
+    description: Optional[str]
     completed: bool
-    priority: str
+    priority: Priority
     tags: List[str]
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        """Pydantic configuration"""
-
         from_attributes = True
-        json_schema_extra = {
-            "example": {
-                "id": 1,
-                "title": "Buy groceries",
-                "description": "Milk, eggs, bread",
-                "completed": False,
-                "priority": "high",
-                "tags": ["shopping", "urgent"],
-                "created_at": "2025-12-07T10:00:00Z",
-                "updated_at": "2025-12-07T10:00:00Z",
-            }
-        }
 
 
 class TaskListResponse(BaseModel):
-    """Schema for task list response (GET /tasks)"""
-
+    """Task list response with pagination"""
     tasks: List[TaskRead]
-    total: int = Field(..., description="Total number of tasks matching filters")
-    limit: int = Field(..., description="Maximum tasks per page")
-    offset: int = Field(..., description="Number of tasks skipped")
+    total: int
+    limit: int
+    offset: int
+
+
+# Subtask schemas
+class SubtaskCreate(BaseModel):
+    """Schema for creating a subtask"""
+    title: str = Field(..., max_length=500)
+    display_order: Optional[int] = 0
+
+
+class SubtaskUpdate(BaseModel):
+    """Schema for updating a subtask"""
+    title: Optional[str] = Field(None, max_length=500)
+    completed: Optional[bool] = None
+    display_order: Optional[int] = None
+
+
+# Note schemas
+class NoteCreate(BaseModel):
+    """Schema for creating a note"""
+    content: str = Field(..., max_length=5000)
+
+
+class NoteUpdate(BaseModel):
+    """Schema for updating a note"""
+    content: str = Field(..., max_length=5000)
+
+
+# Attachment schemas
+class AttachmentCreate(BaseModel):
+    """Schema for creating an attachment"""
+    filename: str
+    file_url: str
+    file_size: int
+    mime_type: str
+
+
+# Template schemas
+class TemplateCreate(BaseModel):
+    """Schema for creating a template"""
+    name: str = Field(..., max_length=200)
+    title: str = Field(..., max_length=500)
+    description: Optional[str] = Field(None, max_length=5000)
+    priority: Priority = Priority.MEDIUM
+    tags: Optional[str] = Field(None, max_length=1000)
+    subtasks: Optional[str] = Field(None, max_length=10000)
+
+
+class TemplateResponse(TemplateCreate):
+    """Template response schema"""
+    id: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        """Pydantic configuration"""
-
-        json_schema_extra = {
-            "example": {
-                "tasks": [
-                    {
-                        "id": 1,
-                        "title": "Buy groceries",
-                        "description": "Milk, eggs, bread",
-                        "completed": False,
-                        "priority": "high",
-                        "tags": ["shopping", "urgent"],
-                        "created_at": "2025-12-07T10:00:00Z",
-                        "updated_at": "2025-12-07T10:00:00Z",
-                    }
-                ],
-                "total": 1,
-                "limit": 50,
-                "offset": 0,
-            }
-        }
+        from_attributes = True
 
 
-class VoiceCommandCreate(BaseModel):
-    """Schema for creating a voice command record"""
-
-    transcript: str = Field(..., max_length=500)
-    language: str = Field(..., pattern="^(en|ur|ar|es|fr|de)$")
-
-    class Config:
-        """Pydantic configuration"""
-
-        json_schema_extra = {"example": {"transcript": "Add task buy milk", "language": "en"}}
+# Bulk operation schemas
+class BulkOperationRequest(BaseModel):
+    """Schema for bulk operations"""
+    task_ids: List[int]
 
 
-class ChatMessageCreate(BaseModel):
-    """Schema for creating a chat message"""
+class BulkTagRequest(BulkOperationRequest):
+    """Schema for bulk tag operation"""
+    tag: str
 
-    content: str = Field(..., min_length=1, max_length=5000)
-    language: str = Field(default="en", pattern="^(en|ur|ar|es|fr|de)$")
 
-    class Config:
-        """Pydantic configuration"""
+class BulkPriorityRequest(BulkOperationRequest):
+    """Schema for bulk priority operation"""
+    priority: Priority
 
-        json_schema_extra = {"example": {"content": "What tasks do I have?", "language": "en"}}
+
+# Reorder schema
+class ReorderRequest(BaseModel):
+    """Schema for reordering tasks/subtasks"""
+    items: List[dict]  # [{"id": 1, "display_order": 0}, ...]
