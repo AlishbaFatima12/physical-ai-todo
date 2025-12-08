@@ -1,10 +1,32 @@
-fastapi>=0.104.1
-sqlmodel>=0.0.14
-uvicorn[standard]>=0.24.0
-python-dotenv>=1.0.0
-asyncpg>=0.29.0
-anthropic>=0.7.8
-pydantic>=2.5.0
-pytest>=7.4.3
-pytest-asyncio>=0.21.1
-httpx>=0.25.2
+# FastAPI and core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+sqlmodel==0.0.14
+psycopg[binary]>=3.2.2
+alembic==1.13.0
+
+# AI and ML
+anthropic==0.7.8
+# pytesseract==0.3.10  # OCR - optional for now
+Pillow>=10.0.0
+
+# Data processing
+pandas==2.1.4
+# PyPDF2==3.0.1  # PDF - optional for now
+
+# Email
+python-emails==0.6
+
+# Utilities
+python-dotenv==1.0.0
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-asyncio==0.21.1
+httpx==0.25.2

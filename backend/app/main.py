@@ -1,107 +1,74 @@
-"""
-Physical AI Todo Application - FastAPI Backend
-
-Main application entry point with CORS, routes, and lifecycle management.
-"""
-
-import os
-from contextlib import asynccontextmanager
-
-from dotenv import load_dotenv
+"""FastAPI application entry point with CORS middleware and health check"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.database import init_db, close_db
+from contextlib import asynccontextmanager
+import os
+from dotenv import load_dotenv
 from app.routes import tasks
+from app.database import init_db
 
 # Load environment variables
 load_dotenv()
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Application lifespan manager.
-
-    Handles startup and shutdown events:
-    - Startup: Initialize database tables
-    - Shutdown: Close database connections
-    """
+    """Lifespan events for startup and shutdown"""
     # Startup
-    print("Starting up Physical AI Todo API...")
-    try:
-        await init_db()
-        print("Database initialized successfully")
-    except Exception as e:
-        print(f"Warning: Database initialization failed: {e}")
-
+    print("Starting Physical AI Todo API")
+    print("Initializing database...")
+    await init_db()
+    print("Database initialized successfully")
     yield
-
     # Shutdown
-    print("Shutting down...")
-    await close_db()
-    print("Database connections closed")
+    print("Shutting down Physical AI Todo API")
 
-
-# Create FastAPI app
+# Initialize FastAPI app
 app = FastAPI(
     title="Physical AI Todo API",
-    description="RESTful API for managing tasks with priorities, tags, and AI features",
-    version="2.0.0",
-    lifespan=lifespan,
+    description="Full-stack todo application with AI-powered features",
+    version="0.1.0",
+    lifespan=lifespan
 )
 
-
-# Configure CORS
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+# Configure CORS - allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origin_regex=r"http://localhost:\d+",  # Allow any localhost port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
-
-# Register routes
+# Include routers
 app.include_router(tasks.router)
 
-
-@app.get("/", tags=["health"])
-async def root():
-    """
-    Root endpoint - API health check.
-
-    Returns:
-        Welcome message and API status
-    """
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
     return {
-        "message": "Physical AI Todo API",
-        "version": "2.0.0",
-        "status": "running",
-        "docs": "/docs",
+        "status": "healthy",
+        "version": "0.1.0",
+        "service": "Physical AI Todo API"
     }
 
-
-@app.get("/health", tags=["health"])
-async def health_check():
-    """
-    Health check endpoint for monitoring.
-
-    Returns:
-        Health status
-    """
-    return {"status": "healthy", "service": "physical-ai-todo-api"}
-
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint with API information"""
+    return {
+        "name": "Physical AI Todo API",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
 
 if __name__ == "__main__":
     import uvicorn
-
-    port = int(os.getenv("PORT", 8000))
     uvicorn.run(
-        "app.main:app",
+        "main:app",
         host="0.0.0.0",
-        port=port,
-        reload=True,
-        log_level="info",
+        port=8000,
+        reload=True
     )

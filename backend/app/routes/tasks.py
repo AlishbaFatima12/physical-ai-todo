@@ -8,7 +8,7 @@ import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import Session
 
 from app import crud
 from app.database import get_session
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
 
 
 @router.get("", response_model=TaskListResponse)
-async def get_tasks(
+def get_tasks(
     limit: int = Query(50, ge=1, le=100, description="Maximum tasks per page"),
     offset: int = Query(0, ge=0, description="Number of tasks to skip"),
     search: Optional[str] = Query(None, description="Search in title/description"),
@@ -27,7 +27,7 @@ async def get_tasks(
     tags: Optional[str] = Query(None, description="Comma-separated tags to filter by"),
     sort: str = Query("created_at", pattern="^(created_at|updated_at|priority|title)$", description="Sort field"),
     order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     List all tasks with optional filtering, search, sorting, and pagination.
@@ -47,7 +47,7 @@ async def get_tasks(
     - Total count of matching tasks
     - Pagination info (limit, offset)
     """
-    tasks, total = await crud.list_tasks(
+    tasks, total = crud.list_tasks(
         session=session,
         limit=limit,
         offset=offset,
@@ -78,9 +78,9 @@ async def get_tasks(
 
 
 @router.post("", response_model=TaskRead, status_code=201)
-async def create_task(
+def create_task(
     task_data: TaskCreate,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Create a new task.
@@ -94,7 +94,7 @@ async def create_task(
     **Returns:**
     - Created task with ID and timestamps
     """
-    db_task = await crud.create_task(task_data, session)
+    db_task = crud.create_task(task_data, session)
 
     # Parse tags from JSON string
     return TaskRead(
@@ -110,9 +110,9 @@ async def create_task(
 
 
 @router.get("/{task_id}", response_model=TaskRead)
-async def get_task(
+def get_task(
     task_id: int,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Get a single task by ID.
@@ -126,7 +126,7 @@ async def get_task(
     **Raises:**
     - 404: Task not found
     """
-    db_task = await crud.get_task(task_id, session)
+    db_task = crud.get_task(task_id, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
@@ -143,10 +143,10 @@ async def get_task(
 
 
 @router.put("/{task_id}", response_model=TaskRead)
-async def update_task(
+def update_task(
     task_id: int,
     task_data: TaskUpdate,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Update a task (full replacement).
@@ -163,7 +163,7 @@ async def update_task(
     **Raises:**
     - 404: Task not found
     """
-    db_task = await crud.update_task(task_id, task_data, session)
+    db_task = crud.update_task(task_id, task_data, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
@@ -180,10 +180,10 @@ async def update_task(
 
 
 @router.patch("/{task_id}", response_model=TaskRead)
-async def patch_task(
+def patch_task(
     task_id: int,
     task_data: TaskPatch,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Partially update a task.
@@ -205,7 +205,7 @@ async def patch_task(
     **Raises:**
     - 404: Task not found
     """
-    db_task = await crud.patch_task(task_id, task_data, session)
+    db_task = crud.patch_task(task_id, task_data, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
@@ -222,9 +222,9 @@ async def patch_task(
 
 
 @router.delete("/{task_id}", status_code=204)
-async def delete_task(
+def delete_task(
     task_id: int,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Delete a task.
@@ -238,7 +238,7 @@ async def delete_task(
     **Raises:**
     - 404: Task not found
     """
-    deleted = await crud.delete_task(task_id, session)
+    deleted = crud.delete_task(task_id, session)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
@@ -246,9 +246,9 @@ async def delete_task(
 
 
 @router.post("/{task_id}/toggle", response_model=TaskRead)
-async def toggle_task_completion(
+def toggle_task_completion(
     task_id: int,
-    session: AsyncSession = Depends(get_session),
+    session: Session = Depends(get_session),
 ):
     """
     Toggle task completion status (completed <-> not completed).
@@ -262,7 +262,7 @@ async def toggle_task_completion(
     **Raises:**
     - 404: Task not found
     """
-    db_task = await crud.toggle_complete(task_id, session)
+    db_task = crud.toggle_complete(task_id, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
