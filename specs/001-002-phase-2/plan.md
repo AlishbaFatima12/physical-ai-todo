@@ -1,71 +1,70 @@
-# Implementation Plan: Phase II - Full-Stack Web Application + Multi-language AI
+# Implementation Plan: Phase II - Full-Stack Web Application with Enhanced Features
 
-**Branch**: `001-002-phase-2` | **Date**: 2025-12-07 | **Deadline**: 2025-12-12
+**Branch**: `001-002-phase-2` | **Date**: 2025-12-08 | **Deadline**: 2025-12-15
 **Spec**: [spec.md](./spec.md)
 
 ## Summary
 
-Transform the Phase I console application into a full-stack web application with persistent PostgreSQL storage (Neon DB), modern React frontend (Next.js), RESTful API (FastAPI), and bonus features including multi-language support (6 languages), voice commands, and AI chatbot integration. This phase adds priorities, tags, search, filter, and sort capabilities while maintaining all Phase I CRUD operations.
+Transform Phase I console application into a production-ready, full-stack web application with 25+ features across 10 user stories. Implements persistent PostgreSQL storage (Neon DB), modern React frontend (Next.js 14), RESTful API (FastAPI), multi-language support (6 languages), voice commands, AI integration, and stunning 3D visual effects.
 
-**Key Additions:**
-- Migrate from in-memory to Neon DB (PostgreSQL)
-- Build Next.js frontend with TypeScript + Tailwind CSS
-- Implement FastAPI REST API with SQLModel ORM
-- Add priorities (high/medium/low) and tags
-- Build search, filter, and sort functionality
-- **BONUS**: Voice commands in 6 languages (EN, UR, AR, ES, FR, DE)
-- **BONUS**: AI chatbot with Claude integration
-- **BONUS**: Claude Code Skills for reusable intelligence
+**See Also**:
+- [execution-strategy.md](./execution-strategy.md) - Agent-powered development plan (10 skills, 8 agents)
+- [quality-framework.md](./quality-framework.md) - Performance, testing, zero-bug standards
+
+**Key Features (10 User Stories)**:
+- US1-2: Basic web CRUD + organization (priorities, tags, search, filter, sort)
+- US3-4: Multi-language voice + AI chatbot (6 languages)
+- US5: Interactive (drag-drop, bulk actions, keyboard shortcuts, undo/redo)
+- US6: Rich details (subtasks, notes, attachments up to 10MB, OCR)
+- US7: UX polish (dark/light mode, 3D effects, animations, WCAG AA)
+- US8: Data management (export/import CSV/JSON, templates, analytics)
+- US9-10: AI intelligence + email integration (bonus features)
+
+**Execution**: Agent-powered (28-40 hours vs 96+ manual), quality-first (90%+ test coverage, zero bugs)
+
+---
 
 ## Technical Context
 
 **Language/Version**: Python 3.13+ (backend), TypeScript 5.3+ (frontend)
-**Primary Dependencies**: FastAPI 0.104+, SQLModel 0.0.14, Next.js 14+, React 18+
-**Storage**: Neon DB (Serverless PostgreSQL)
-**Testing**: pytest (backend), Jest + React Testing Library (frontend)
-**Target Platform**: Web browsers (Chrome, Firefox, Safari, Edge), Linux/Windows server
-**Project Type**: Full-stack web application (backend + frontend)
-**Performance Goals**: API response time <500ms (p95), Search results <200ms, UI updates <100ms
-**Constraints**: Deadline Dec 12 (5 days), Must maintain Phase I compatibility, Multi-language support
-**Scale/Scope**: 100+ concurrent users, 1000+ tasks, 6 languages, Voice + AI features
+
+**Primary Dependencies**:
+- Backend: FastAPI 0.104+, SQLModel 0.0.14, Anthropic SDK, pytesseract, pandas
+- Frontend: Next.js 14, React 18, Tailwind CSS, @dnd-kit, recharts, framer-motion
+
+**Storage**: Neon DB (Serverless PostgreSQL) with connection pooling, Alembic migrations
+
+**Testing**: pytest + pytest-cov (backend 90%+), Jest + Playwright (frontend 90%+)
+
+**Target Platform**: Web (Chrome, Firefox, Safari, Edge), deployed to Vercel + Railway
+
+**Project Type**: Full-stack web application (backend API + frontend SPA)
+
+**Performance Goals**: API <200ms (p95), UI <100ms, First Paint <1.0s, Lighthouse >90
+
+**Constraints**: 5-7 days timeline, 90%+ coverage mandatory, WCAG AA required, zero production bugs
+
+**Scale/Scope**: 100+ concurrent users, 10K+ tasks/user, 6 languages, 60 functional requirements
+
+---
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-### Phase II Requirements (from Constitution)
-
-✅ **PASS** - Technology Stack Compliance:
-- Backend: FastAPI 0.104+ ✓
-- ORM: SQLModel ✓
-- Database: Neon DB (PostgreSQL) ✓
-- Frontend: Next.js 14+ ✓
-- Language: TypeScript ✓
-
-✅ **PASS** - Feature Scope Compliance:
-- Implements all 5 Phase I features (Add, View, Update, Delete, Mark Complete) ✓
-- Adds 5 Phase II features (Priorities, Tags, Search, Filter, Sort) ✓
-- Does NOT implement Phase III features (Recurring, Due Dates, Reminders) ✓
-
-✅ **PASS** - Architecture Evolution:
-- Preserves Phase I code in `src/todo/` for reference ✓
-- Creates new `backend/` and `frontend/` directories ✓
-- Maintains backward compatibility with Phase I data model ✓
-
-✅ **PASS** - Spec-Driven Development:
-- Specification created via `/sp.specify` ✓
-- Implementation plan via `/sp.plan` (this document) ✓
-- Will generate tasks via `/sp.tasks` ✓
-- Will implement via `/sp.implement` ✓
-
-⚠️ **REVIEW** - Bonus Features (Not in Constitution Phase II):
-- Multi-language support (6 languages) - BONUS ✓
-- Voice commands - BONUS ✓
-- AI chatbot - BONUS (designated for Phase III in constitution)
-- **Justification**: Hackathon bonus requirements, does not conflict with Phase II core
+✅ **PASS** - Technology stack compliant (FastAPI, SQLModel, Neon DB, Next.js 14, TypeScript)
+✅ **PASS** - Phase II features correct (5 basic + 5 intermediate, no Phase III features like recurring tasks/calendar)
+✅ **PASS** - Architecture evolution (Phase I preserved, new backend/frontend dirs, backward compatible)
+✅ **PASS** - Spec-driven development (spec → plan → tasks → implement)
+⚠️ **REVIEW** - Enhanced scope beyond constitution (justified: P2 features required for production quality, P3 clearly marked optional)
 
 ### Post-Design Re-check
-*To be completed after Phase 1 design artifacts*
+- [ ] Data model maintains Phase I compatibility
+- [ ] API contracts follow REST best practices
+- [ ] All entities properly indexed
+- [ ] Migration strategy validated
+
+---
 
 ## Project Structure
 
@@ -73,370 +72,218 @@ Transform the Phase I console application into a full-stack web application with
 
 ```text
 specs/001-002-phase-2/
-├── spec.md              # Feature specification
-├── plan.md              # This file (/sp.plan output)
-├── research.md          # Phase 0: Technology research
-├── data-model.md        # Phase 1: Database schema
-├── quickstart.md        # Phase 1: Setup instructions
-├── contracts/           # Phase 1: API contracts
-│   ├── openapi.yaml     # OpenAPI 3.0 spec
-│   └── api-examples.md  # Request/response examples
-└── tasks.md             # Phase 2: Task breakdown (/sp.tasks)
+├── spec.md                    # 60 functional requirements, 10 user stories
+├── plan.md                    # This file
+├── execution-strategy.md      # Agent execution plan
+├── quality-framework.md       # Quality standards
+├── research.md                # Phase 0 output
+├── data-model.md              # Phase 1: 7 entities
+├── quickstart.md              # Phase 1: Setup guide
+├── contracts/
+│   ├── openapi.yaml           # 50+ endpoints
+│   └── api-examples.md
+└── tasks.md                   # Phase 2: /sp.tasks output
 ```
 
 ### Source Code (repository root)
 
 ```text
 physical-ai-todo/
-├── backend/                    # FastAPI application
+├── backend/                   # FastAPI (Python 3.13+)
 │   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py            # FastAPI app + CORS + middleware
-│   │   ├── database.py        # Neon DB connection + engine
-│   │   ├── models.py          # SQLModel table definitions
-│   │   ├── schemas.py         # Pydantic request/response schemas
-│   │   ├── crud.py            # Database CRUD operations
-│   │   ├── routes/
-│   │   │   ├── __init__.py
-│   │   │   ├── tasks.py       # Task CRUD endpoints
-│   │   │   ├── voice.py       # Voice command endpoints
-│   │   │   └── chat.py        # AI chatbot endpoints
-│   │   ├── services/
-│   │   │   ├── voice_service.py # Voice processing logic
-│   │   │   ├── ai_service.py    # Claude API integration
-│   │   │   └── translation.py   # Multi-language support
-│   │   └── skills/            # Claude Code Skills
-│   │       ├── task_analyzer.py
-│   │       ├── priority_recommender.py
-│   │       └── tag_suggester.py
-│   ├── tests/
-│   │   ├── conftest.py        # pytest fixtures
-│   │   ├── test_crud.py       # Unit tests for CRUD
-│   │   ├── test_api.py        # Integration tests for API
-│   │   ├── test_voice.py      # Voice service tests
-│   │   └── test_chat.py       # AI chatbot tests
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── Dockerfile
+│   │   ├── main.py           # FastAPI app + CORS + middleware
+│   │   ├── database.py        # Neon DB connection
+│   │   ├── models.py          # SQLModel (7 entities)
+│   │   ├── routes/            # 50+ endpoints (tasks, subtasks, notes, attachments, etc.)
+│   │   ├── services/          # AI, OCR, email, analytics
+│   │   └── skills/            # Claude Code skills
+│   ├── alembic/               # DB migrations
+│   ├── tests/                 # pytest (90%+ coverage)
+│   └── requirements.txt
 │
-├── frontend/                   # Next.js application
-│   ├── app/
-│   │   ├── page.tsx           # Main dashboard
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── globals.css        # Global Tailwind styles
-│   │   └── api/               # API route handlers (if needed)
-│   ├── components/
-│   │   ├── ui/                # shadcn/ui components
-│   │   ├── TaskList.tsx
-│   │   ├── TaskItem.tsx
-│   │   ├── TaskForm.tsx       # Create/edit form
-│   │   ├── FilterBar.tsx      # Search/filter controls
-│   │   ├── SortControls.tsx   # Sort dropdown
-│   │   ├── PriorityBadge.tsx  # Priority indicator
-│   │   ├── TagInput.tsx       # Tag management
-│   │   ├── VoiceInput.tsx     # Voice command button
-│   │   ├── ChatBot.tsx        # AI chat panel
-│   │   └── LanguageSelector.tsx # Language switcher
-│   ├── lib/
-│   │   ├── api.ts             # API client functions
-│   │   ├── types.ts           # TypeScript interfaces
-│   │   ├── voice.ts           # Voice utilities
-│   │   └── utils.ts           # Helper functions
-│   ├── hooks/
-│   │   ├── useTasks.ts        # SWR hook for tasks
-│   │   ├── useVoice.ts        # Voice recognition hook
-│   │   └── useChat.ts         # Chat state hook
-│   ├── public/
-│   │   ├── locales/           # Translation files
-│   │   │   ├── en.json
-│   │   │   ├── ur.json
-│   │   │   ├── ar.json
-│   │   │   ├── es.json
-│   │   │   ├── fr.json
-│   │   │   └── de.json
-│   │   └── flags/             # Flag icons for languages
-│   ├── tests/
-│   │   ├── components/        # Component tests
-│   │   └── integration/       # E2E tests
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── tailwind.config.js
-│   ├── next.config.js
-│   ├── .env.local.example
-│   └── Dockerfile
+├── frontend/                  # Next.js 14 (TypeScript)
+│   ├── app/                   # App Router pages
+│   ├── components/            # React components (15+)
+│   ├── lib/                   # API client, utils
+│   ├── hooks/                 # Custom hooks
+│   ├── __tests__/             # Jest + Playwright
+│   └── package.json
 │
-├── src/todo/                   # Phase I code (preserved)
-│   └── (existing Phase I files - DO NOT MODIFY)
+├── .claude/                   # Claude Code
+│   ├── skills/                # 10 reusable skills
+│   └── agents/                # 8 specialized agents
 │
-├── .claude/
-│   └── skills/                # Claude Code Skills
-│       ├── task-analyzer.md
-│       ├── priority-recommender.md
-│       ├── tag-suggester.md
-│       └── deployment-blueprint.md
-│
-├── specs/                     # All feature specs
-├── history/                   # PHRs and ADRs
-├── docker-compose.yml         # Local dev environment
-└── README.md                  # Updated with Phase II instructions
+├── src/todo/                  # Phase I (preserved)
+└── specs/                     # Feature specs
 ```
 
-**Structure Decision**: Web application structure (Option 2) selected based on frontend + backend requirements. Backend uses FastAPI with layered architecture (routes → services → CRUD → models). Frontend uses Next.js App Router with component-based UI. Phase I code preserved in `src/todo/` for reference.
-
-## Complexity Tracking
-
-> **No constitution violations requiring justification**
-
-Bonus features (voice, AI, multi-language) are additive and do not conflict with Phase II core requirements.
-
-## Phase 0: Research & Technical Decisions
-
-### Research Tasks
-
-#### 1. Neon DB Setup & Connection
-**Question**: How to set up Neon DB and connect from FastAPI?
-**Task**: Research Neon DB provisioning, connection string format, SQLModel integration
-
-#### 2. Multi-language Implementation
-**Question**: Best approach for 6-language support in Next.js + FastAPI?
-**Task**: Research i18next, next-i18next, RTL support, language detection
-
-#### 3. Voice Recognition
-**Question**: Web Speech API support across browsers and languages?
-**Task**: Research browser compatibility, language support, fallback strategies
-
-#### 4. Claude AI Integration
-**Question**: How to integrate Claude API for chatbot in FastAPI?
-**Task**: Research Anthropic SDK, streaming responses, rate limiting
-
-#### 5. Deployment Strategy
-**Question**: Best way to deploy Next.js + FastAPI + Neon DB?
-**Task**: Research Vercel (frontend), Railway/Render (backend), environment variables
-
-### Research Outputs (to be generated in research.md)
-
-For each research task, document:
-- **Decision**: Selected approach
-- **Rationale**: Why this choice
-- **Alternatives**: Other options considered
-- **Implementation**: Key code patterns
-- **Risks**: Potential issues
-
-## Phase 1: Design & Contracts
-
-### Data Model (to be generated in data-model.md)
-
-#### Core Entities
-
-**Task** (SQLModel table)
-- Fields: id, title, description, completed, priority, tags, created_at, updated_at
-- Indexes: id (PK), title, completed, priority
-- Validation: title 1-200 chars, description max 2000 chars
-- Relationships: None (single-user Phase II)
-
-**VoiceCommand** (SQLModel table - optional, for logging)
-- Fields: id, transcript, language, intent, confidence, created_at
-- Purpose: Track voice command usage and accuracy
-
-**ChatMessage** (SQLModel table - optional, for history)
-- Fields: id, role, content, language, created_at
-- Purpose: Persist chat history
-
-### API Contracts (to be generated in contracts/openapi.yaml)
-
-#### REST Endpoints
-
-**Base URL**: `http://localhost:8000/api/v1`
-
-**Tasks**
-- `GET /tasks` - List all tasks (with query params)
-  - Query: search, completed, priority, tags, sort, order, limit, offset
-  - Response: `{ tasks: Task[], total: number }`
-- `GET /tasks/{id}` - Get single task
-  - Response: `Task`
-- `POST /tasks` - Create task
-  - Body: `{ title, description?, priority?, tags? }`
-  - Response: `Task`
-- `PUT /tasks/{id}` - Update task (full)
-  - Body: `{ title, description, priority, tags, completed }`
-  - Response: `Task`
-- `PATCH /tasks/{id}` - Partial update
-  - Body: `{ title?, description?, priority?, tags?, completed? }`
-  - Response: `Task`
-- `DELETE /tasks/{id}` - Delete task
-  - Response: `{ message: string }`
-
-**Voice**
-- `POST /voice/transcribe` - Transcribe audio to text
-  - Body: `{ audio: base64, language?: string }`
-  - Response: `{ transcript: string, language: string, confidence: number }`
-- `POST /voice/command` - Execute voice command
-  - Body: `{ transcript: string, language: string }`
-  - Response: `{ action: string, result: any }`
-
-**Chat**
-- `POST /chat/message` - Send message to AI
-  - Body: `{ content: string, language: string }`
-  - Response: `{ response: string, language: string }`
-- `GET /chat/history` - Get chat history
-  - Response: `{ messages: ChatMessage[] }`
-- `DELETE /chat/history` - Clear history
-  - Response: `{ message: string }`
-
-### Quickstart Guide (to be generated in quickstart.md)
-
-Sections:
-1. Prerequisites (Python 3.13+, Node.js 18+, Neon DB account)
-2. Environment setup (.env files)
-3. Backend setup (install dependencies, run migrations, start server)
-4. Frontend setup (install dependencies, configure API URL, start dev server)
-5. Testing instructions
-6. Deployment guide
-
-### Agent Context Update
-
-After generating design artifacts, run:
-```bash
-.specify/scripts/bash/update-agent-context.sh claude
-```
-
-This will update `CLAUDE.md` with Phase II technology stack.
-
-## Phase 2: Implementation Tasks
-
-*To be generated via `/sp.tasks` command*
-
-High-level task categories:
-
-### Day 1: Backend Setup & Database (Dec 7)
-- Set up Neon DB instance
-- Initialize FastAPI project structure
-- Create SQLModel models with migrations
-- Implement basic CRUD operations
-- Test database connectivity
-
-### Day 2: Backend API & Features (Dec 8)
-- Implement all REST endpoints
-- Add search, filter, sort logic
-- Input validation with Pydantic
-- Enable CORS for frontend
-- API testing with pytest
-
-### Day 3: Frontend Core (Dec 9)
-- Initialize Next.js project with TypeScript
-- Set up Tailwind CSS + shadcn/ui
-- Build TaskList, TaskItem, TaskForm components
-- Implement API client functions
-- Connect frontend to backend
-
-### Day 4: Frontend Enhanced + Voice (Dec 10)
-- Build search, filter, sort UI
-- Add loading states and error handling
-- Implement responsive design
-- Integrate Web Speech API
-- Test voice commands
-
-### Day 5: AI & Multi-language (Dec 11)
-- Integrate Claude API for chatbot
-- Build chat UI component
-- Add i18next for translations
-- Implement language switcher
-- Create Claude Code Skills
-
-### Day 6: Testing & Deployment (Dec 12)
-- End-to-end testing
-- Fix bugs and edge cases
-- Update documentation
-- Deploy to Vercel + Railway
-- Create demo video
-
-## Implementation Strategy
-
-### Priority Order (P1 → P2 → P3)
-
-**P1 (Must Have - Core Phase II)**
-1. Backend API with all endpoints
-2. Neon DB integration
-3. Next.js frontend with CRUD
-4. Priorities and tags
-5. Search, filter, sort
-
-**P2 (Should Have - Enhanced UX)**
-6. Responsive design
-7. Loading states and error handling
-8. API documentation (Swagger)
-9. Comprehensive testing
-
-**P3 (Nice to Have - Bonus)**
-10. Voice commands (6 languages)
-11. AI chatbot
-12. Multi-language UI
-13. Claude Code Skills
-14. Deployment
-
-### Risk Mitigation
-
-1. **Tight Timeline**: Focus P1 first, P2 second, P3 if time permits
-2. **Database Issues**: Test Neon DB early, have local PostgreSQL fallback
-3. **API Complexity**: Start with simple CRUD, add filters/search incrementally
-4. **Voice API Limitations**: Use Web Speech API (free), accept limited browser support
-5. **Multi-language**: Start with English + 1 language, add more incrementally
-6. **Claude API**: Implement basic chat first, add context awareness later
-
-### Testing Strategy
-
-**Backend**
-- Unit tests: CRUD operations, business logic
-- Integration tests: API endpoints
-- Test coverage: >80%
-
-**Frontend**
-- Component tests: React Testing Library
-- Integration tests: User flows
-- E2E tests: Playwright (optional)
-
-**Manual Testing**
-- All features in all 6 languages
-- Voice commands in each language
-- AI chatbot conversations
-- Mobile responsive design
-
-## Success Criteria
-
-### Technical
-- ✅ All API endpoints functional and tested
-- ✅ Neon DB connected and persisting data
-- ✅ Next.js frontend deployed and responsive
-- ✅ Search returns results <200ms
-- ✅ API responses <500ms (p95)
-- ✅ Test coverage >80%
-
-### Functional
-- ✅ All 5 Phase I features working in web UI
-- ✅ All 5 Phase II features (priorities, tags, search, filter, sort)
-- ✅ Voice commands working in English (minimum)
-- ✅ AI chatbot responds to basic queries
-- ✅ At least 2 languages fully supported
-
-### Documentation
-- ✅ README updated with setup instructions
-- ✅ API documented with OpenAPI/Swagger
-- ✅ All specs, plans, tasks in `specs/001-002-phase-2/`
-- ✅ Demo video or screenshots
-
-## Next Steps
-
-1. **Approve this plan**
-2. **Run `/sp.tasks`** to generate detailed task breakdown
-3. **Create PHR** for this planning session
-4. **Begin implementation** via `/sp.implement`
-5. **Daily standups** to track progress against timeline
-6. **Continuous testing** as features are implemented
-7. **Submit by Dec 12** before deadline
+**Structure Decision**: Web application - separate backend/frontend. Backend is standalone FastAPI REST API. Frontend is Next.js 14 SPA. Phase I preserved in `src/todo/`.
 
 ---
 
-**Plan Status**: ✅ Ready for Phase 0 Research
-**Next Command**: `/sp.tasks` (after research.md is generated)
-**Estimated Effort**: 5 days (40+ hours)
-**Risk Level**: Medium (tight timeline, multiple new technologies)
+## Phase 0: Research & Technology Validation
+
+**Objective**: Resolve unknowns, validate choices, establish best practices
+
+**Research Tasks**:
+1. Neon DB connection pooling (pool size, validation, recycling)
+2. Next.js 14 performance (code splitting, server vs client components)
+3. Dark mode no-flicker (inline script, system detection, WCAG AA)
+4. 3D effects (framer-motion vs react-spring, performance, glassmorphism)
+5. Drag-drop @dnd-kit (touch support, accessibility, optimistic updates)
+6. OCR integration (pytesseract accuracy, PDF extraction, preprocessing)
+7. React Query caching (staleTime, cacheTime, invalidation)
+8. File upload streaming (multipart, progress, 10MB handling)
+9. Claude API (prompt engineering, context management, cost optimization)
+10. i18n for 6 languages (RTL support, font loading)
+
+**Deliverable**: `research.md` with decisions, rationales, alternatives for each topic
+
+---
+
+## Phase 1: Design & Contracts
+
+**Prerequisites**: research.md complete
+
+### 1.1 Data Model (`data-model.md`)
+
+**7 Entities**:
+1. Task (extended): +display_order, +is_template
+2. Subtask: task_id, title, completed, display_order
+3. Note: task_id, content
+4. Attachment: task_id, filename, file_url, file_size, mime_type, ocr_text
+5. Template: name, title, description, priority, tags, subtasks (JSON)
+6. ActivityLog: task_id, action_type, field_changed, old/new values
+7. VoiceCommand: transcript, language, intent, confidence
+
+**Indexes**: All foreign keys, frequently queried fields (completed, priority, display_order)
+
+### 1.2 API Contracts (`contracts/openapi.yaml`)
+
+**50+ Endpoints**:
+- Tasks (10): CRUD + bulk operations
+- Subtasks (5): CRUD + reorder
+- Notes (4): CRUD
+- Attachments (5): upload, download, OCR
+- Templates (5): CRUD + instantiate
+- Analytics (4): summary, timeline, productivity, activity
+- Export/Import (4): CSV/JSON
+- AI (9): chat, suggest, breakdown, parse, search, insights
+- Email (3): send, parse, inbox address
+- Voice (2): transcribe, command
+
+### 1.3 Quickstart (`quickstart.md`)
+
+- Prerequisites (Python 3.13+, Node 20+, Neon DB)
+- Environment setup
+- Backend setup (venv, pip, alembic, uvicorn)
+- Frontend setup (npm install, npm run dev)
+- Testing (pytest, npm test)
+- Common issues
+
+### 1.4 Agent Context Update
+
+Run: `.specify/scripts/bash/update-agent-context.sh claude`
+
+---
+
+## Phase 2: Task Breakdown
+
+**Delegated to**: `/sp.tasks` command
+
+**Expected**: 150+ tasks in `tasks.md` organized by phase, user story, priority, parallelizability
+
+---
+
+## Implementation Strategy (See execution-strategy.md)
+
+**10 Custom Skills**: fastapi-crud, nextjs-component, sqlmodel-schema, api-client, alembic-migration, test-generator, dark-mode, analytics-dashboard, ocr-service, email-integration
+
+**8 Specialized Agents**: db-architect, backend-builder, frontend-builder, ai-engineer, file-handler, data-migrator, ux-polisher, qa-tester
+
+**3-Phase Execution**:
+- Phase 1: Foundation (8h parallel) - DB + API + frontend setup + AI
+- Phase 2: Core Features (12h parallel) - Interactive + rich details + data + files
+- Phase 3: Polish (6h sequential) - QA + animations + deployment
+
+**Time**: 28-40 hours (vs 96+ manual) = 60-70% savings
+
+---
+
+## Quality Assurance (See quality-framework.md)
+
+**Performance**:
+- API p95 <200ms, UI <100ms, FCP <1.0s, Lighthouse >90
+- Database indexes, React.memo, code splitting, caching
+
+**Testing**:
+- 90%+ coverage (70% unit, 20% integration, 10% E2E)
+- CI enforces coverage minimums
+- Playwright for user flows
+
+**Dark Mode**:
+- No flicker (inline script before hydration)
+- Persisted in localStorage
+- System preference detection
+- WCAG AA contrast (4.5:1 minimum)
+- 200ms smooth transitions
+
+**3D Effects**:
+- 60fps (16ms budget)
+- GPU-accelerated transforms
+- Reduce-motion support
+- Graceful degradation
+
+---
+
+## Risk Mitigation
+
+1. **Scope creep**: P1/P2 first, P3 bonus, time-box to 2x estimate
+2. **Performance**: indexes, memoization, code splitting, perf tests in CI
+3. **Dark mode flicker**: inline script, localStorage, comprehensive testing
+4. **Agent coordination**: dependency graph, parallel execution, TodoWrite tracking
+5. **Coverage failure**: test-generator skill, CI enforcement, QA checklist
+
+---
+
+## Success Criteria
+
+**Phase 0 Complete**: All research documented, technology choices justified
+**Phase 1 Complete**: data-model.md, contracts/, quickstart.md, agent context updated
+**Phase 2 Complete**: tasks.md with 150+ tasks
+**Implementation Complete**: All P1/P2 features (18), 90%+ coverage, quality gates passed, perfect dark mode, performance targets met, deployed
+**Bonus Complete**: P3 features, 6 languages, 3D effects, demo video
+
+---
+
+## Deliverables
+
+### Design Artifacts (Phase 1)
+1. ✅ plan.md
+2. ⏳ research.md
+3. ⏳ data-model.md
+4. ⏳ contracts/openapi.yaml
+5. ⏳ quickstart.md
+
+### Implementation (Phase 2+)
+6. ⏳ tasks.md
+7. ⏳ Backend code
+8. ⏳ Frontend code
+9. ⏳ Tests (90%+)
+10. ⏳ Deployment
+
+---
+
+## Next Steps
+
+1. Create Phase 0 artifacts (research.md) - 2h
+2. Create Phase 1 artifacts (data-model.md, contracts/, quickstart.md) - 3h
+3. Run `/sp.tasks` - 30min
+4. Review and approve - 1h
+5. Begin implementation via `/sp.implement` - 28-40h
+
+**Total**: 35-47 hours (~5-6 days)
+
+**Plan Status**: Phase 0 (Research) - Ready to begin
+**Last Updated**: 2025-12-08
+**Next Action**: Create research.md
