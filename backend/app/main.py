@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
 from app.routes import tasks
+from app.auth import routes as auth
 from app.database import init_db
 
 # Load environment variables
@@ -41,7 +42,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(tasks.router)
+app.include_router(auth.router)  # Auth routes (public)
+app.include_router(tasks.router)  # Task routes (protected)
 
 # Health check endpoint
 @app.get("/health")

@@ -21,9 +21,26 @@ class ActionType(str, Enum):
     RESTORED = "restored"
 
 
+class User(SQLModel, table=True):
+    """User model for authentication"""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    email: str = Field(unique=True, index=True, max_length=255)
+    hashed_password: str = Field(max_length=255)
+    full_name: Optional[str] = Field(default=None, max_length=200)
+    is_active: bool = Field(default=False)  # False until email verified
+    is_verified: bool = Field(default=False)
+    verification_token: Optional[str] = Field(default=None, max_length=255)
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Relationships
+    tasks: List["Task"] = Relationship(back_populates="user", cascade_delete=True)
+
+
 class Task(SQLModel, table=True):
     """Main task model"""
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)  # NEW: user association
     title: str = Field(index=True, max_length=500)
     description: Optional[str] = Field(default=None, max_length=5000)
     completed: bool = Field(default=False, index=True)
@@ -33,8 +50,9 @@ class Task(SQLModel, table=True):
     is_template: bool = Field(default=False, index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
+    user: Optional[User] = Relationship(back_populates="tasks")
     subtasks: List["Subtask"] = Relationship(back_populates="task", cascade_delete=True)
     notes: List["Note"] = Relationship(back_populates="task", cascade_delete=True)
     attachments: List["Attachment"] = Relationship(back_populates="task", cascade_delete=True)
