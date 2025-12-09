@@ -5,19 +5,45 @@ import { useQuery } from '@tanstack/react-query'
 import { getTasks } from '@/lib/api'
 import TaskForm from '@/components/TaskForm'
 import TaskList from '@/components/TaskList'
+import FilterBar from '@/components/FilterBar'
+import ThemeToggle from '@/components/ThemeToggle'
 import { Task } from '@/lib/types'
 
 export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [showForm, setShowForm] = useState(false)
 
-  // Fetch tasks using React Query
+  // Filter/Search/Sort state
+  const [search, setSearch] = useState('')
+  const [priority, setPriority] = useState('')
+  const [completed, setCompleted] = useState('all')
+  const [tags, setTags] = useState('')
+  const [sortField, setSortField] = useState('created_at')
+  const [sortOrder, setSortOrder] = useState('desc')
+
+  // Fetch tasks using React Query with filters
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['tasks'],
-    queryFn: () => getTasks(),
+    queryKey: ['tasks', search, priority, completed, tags, sortField, sortOrder],
+    queryFn: () => getTasks({
+      search: search || undefined,
+      priority: priority || undefined,
+      completed: completed === 'all' ? undefined : completed === 'true',
+      tags: tags || undefined,
+      sort: sortField,
+      order: sortOrder,
+    }),
   })
 
   const tasks = data?.tasks || []
+
+  const handleClearFilters = () => {
+    setSearch('')
+    setPriority('')
+    setCompleted('all')
+    setTags('')
+    setSortField('created_at')
+    setSortOrder('desc')
+  }
 
   const handleSuccess = () => {
     refetch()
@@ -36,23 +62,28 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-2">
-            Physical AI Todo
-          </h1>
-          <p className="text-white text-opacity-90">
-            Your intelligent task management system
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-center flex-grow">
+            <h1 className="text-5xl font-bold text-white mb-2">
+              FlowTask
+            </h1>
+            <p className="text-white text-opacity-90">
+              Effortless Productivity, Beautiful Design
+            </p>
+          </div>
+          <div className="absolute top-6 right-6">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Stats Card */}
         <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 mb-6 shadow-xl">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-3xl font-bold text-white">{tasks.length}</div>
+              <div className="text-3xl font-bold text-white">{data?.total || 0}</div>
               <div className="text-white text-opacity-75 text-sm">Total</div>
             </div>
             <div>
@@ -69,6 +100,23 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* FilterBar */}
+        <FilterBar
+          search={search}
+          onSearchChange={setSearch}
+          priority={priority}
+          onPriorityChange={setPriority}
+          completed={completed}
+          onCompletedChange={setCompleted}
+          tags={tags}
+          onTagsChange={setTags}
+          sortField={sortField}
+          onSortFieldChange={setSortField}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+          onClearFilters={handleClearFilters}
+        />
 
         {/* Task Form */}
         {showForm ? (
