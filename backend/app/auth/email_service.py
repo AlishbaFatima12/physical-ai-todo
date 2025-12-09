@@ -9,8 +9,8 @@ resend.api_key = os.getenv("RESEND_API_KEY", "")
 def send_verification_email(to_email: str, verification_token: str, user_name: Optional[str] = None) -> bool:
     """Send email verification email using Resend"""
     if not resend.api_key:
-        print(f"⚠️  RESEND_API_KEY not set. Email would be sent to: {to_email}")
-        print(f"   Verification link: http://localhost:3000/verify-email?token={verification_token}")
+        print(f"[WARNING] RESEND_API_KEY not set. Email would be sent to: {to_email}")
+        print(f"          Verification link: http://localhost:3000/auth/verify-email?token={verification_token}")
         return True  # Return True in development mode
 
     display_name = user_name or to_email.split('@')[0]
@@ -63,14 +63,14 @@ def send_verification_email(to_email: str, verification_token: str, user_name: O
         })
         return True
     except Exception as e:
-        print(f"❌ Failed to send email: {e}")
+        print(f"[ERROR] Failed to send email: {e}")
         return False
 
 
 def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
     """Send welcome email after verification"""
     if not resend.api_key:
-        print(f"⚠️  RESEND_API_KEY not set. Welcome email would be sent to: {to_email}")
+        print(f"[WARNING] RESEND_API_KEY not set. Welcome email would be sent to: {to_email}")
         return True
 
     display_name = user_name or to_email.split('@')[0]
@@ -133,5 +133,5 @@ def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
         })
         return True
     except Exception as e:
-        print(f"❌ Failed to send welcome email: {e}")
+        print(f"[ERROR] Failed to send welcome email: {e}")
         return False

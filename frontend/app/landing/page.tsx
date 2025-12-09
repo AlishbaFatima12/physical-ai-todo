@@ -82,11 +82,11 @@ export default function LandingPage() {
             key={i}
             className="absolute w-2 h-2 bg-white rounded-full opacity-20"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * 1920,
+              y: Math.random() * 1080,
             }}
             animate={{
-              y: [null, Math.random() * window.innerHeight],
+              y: [null, Math.random() * 1080],
               opacity: [0.2, 0.5, 0.2],
             }}
             transition={{
@@ -116,13 +116,13 @@ export default function LandingPage() {
             className="flex gap-4"
           >
             <button
-              onClick={() => router.push('/signin')}
+              onClick={() => router.push('/auth/signin')}
               className="px-6 py-2 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition-all backdrop-blur-sm border border-white border-opacity-20"
             >
               Sign In
             </button>
             <button
-              onClick={() => router.push('/signup')}
+              onClick={() => router.push('/auth/signup')}
               className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:shadow-xl hover:shadow-purple-500/50 transition-all transform hover:scale-105"
             >
               Get Started Free
@@ -173,7 +173,7 @@ export default function LandingPage() {
             </p>
 
             <motion.button
-              onClick={() => router.push('/signup')}
+              onClick={() => router.push('/auth/signup')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-10 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xl font-bold rounded-xl shadow-2xl shadow-purple-500/50 hover:shadow-purple-500/80 transition-all"
@@ -279,7 +279,7 @@ export default function LandingPage() {
             Join thousands of users who have revolutionized their task management
           </p>
           <button
-            onClick={() => router.push('/signup')}
+            onClick={() => router.push('/auth/signup')}
             className="px-10 py-4 bg-white text-purple-600 text-xl font-bold rounded-xl shadow-2xl hover:shadow-white/50 transition-all transform hover:scale-105"
           >
             Get Started for Free

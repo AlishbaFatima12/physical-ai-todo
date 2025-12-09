@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from app.routes import tasks
 from app.auth import routes as auth
+from app.api import subtasks, notes, attachments
 from app.database import init_db
 
 # Load environment variables
@@ -44,6 +45,9 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router)  # Auth routes (public)
 app.include_router(tasks.router)  # Task routes (protected)
+app.include_router(subtasks.router)  # Subtask routes (protected)
+app.include_router(notes.router)  # Note routes (protected)
+app.include_router(attachments.router)  # Attachment routes (protected)
 
 # Health check endpoint
 @app.get("/health")
