@@ -27,7 +27,9 @@ export default function RootLayout({
                   const theme = localStorage.getItem('theme') || 'system';
                   const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                   const resolved = theme === 'system' ? systemTheme : theme;
-                  document.documentElement.classList.add(resolved);
+                  if (resolved === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
                 } catch (e) {
                   console.error('Theme initialization error:', e);
                 }

@@ -63,12 +63,13 @@ class Subtask(SQLModel, table=True):
     """Subtask model for task checklists"""
     id: Optional[int] = Field(default=None, primary_key=True)
     task_id: int = Field(foreign_key="task.id", index=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
     title: str = Field(max_length=500)
     completed: bool = Field(default=False)
     display_order: int = Field(default=0, index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
     task: Optional[Task] = Relationship(back_populates="subtasks")
 
@@ -77,10 +78,11 @@ class Note(SQLModel, table=True):
     """Note model for task notes"""
     id: Optional[int] = Field(default=None, primary_key=True)
     task_id: int = Field(foreign_key="task.id", index=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
     content: str = Field(max_length=5000)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
     task: Optional[Task] = Relationship(back_populates="notes")
 
@@ -89,13 +91,14 @@ class Attachment(SQLModel, table=True):
     """Attachment model for task file attachments"""
     id: Optional[int] = Field(default=None, primary_key=True)
     task_id: int = Field(foreign_key="task.id", index=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
     filename: str = Field(max_length=255)
     file_url: str = Field(max_length=1000)
     file_size: int = Field(default=0)  # Size in bytes
     mime_type: str = Field(max_length=100)
     ocr_text: Optional[str] = Field(default=None, max_length=10000)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
-    
+
     # Relationships
     task: Optional[Task] = Relationship(back_populates="attachments")
 
