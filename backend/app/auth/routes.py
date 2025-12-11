@@ -151,16 +151,20 @@ def login(
     )
 
 
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
 @router.post("/verify-email")
 def verify_email(
-    token: str,
+    request: VerifyEmailRequest,
     session: Session = Depends(get_session)
 ):
     """Verify user email with token"""
 
     # Find user by verification token
     result = session.execute(
-        select(User).where(User.verification_token == token)
+        select(User).where(User.verification_token == request.token)
     )
     user = result.scalar_one_or_none()
 
@@ -205,15 +209,19 @@ def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+class ResendVerificationRequest(BaseModel):
+    email: EmailStr
+
+
 @router.post("/resend-verification")
 def resend_verification(
-    email: EmailStr,
+    request: ResendVerificationRequest,
     session: Session = Depends(get_session)
 ):
     """Resend verification email"""
 
     # Normalize email to lowercase
-    normalized_email = email.lower()
+    normalized_email = request.email.lower()
 
     result = session.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
