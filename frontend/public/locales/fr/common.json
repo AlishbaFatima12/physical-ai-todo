@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Todo IA Physique",
+    "subtitle": "Application de tâches multilingue avec voix et IA"
+  },
+  "actions": {
+    "add": "Ajouter une Tâche",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "search": "Rechercher des tâches...",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "clear": "Effacer",
+    "close": "Fermer"
+  },
+  "task": {
+    "title": "Titre",
+    "description": "Description",
+    "completed": "Terminée",
+    "pending": "En attente",
+    "created": "Créée",
+    "updated": "Mise à jour",
+    "noTasks": "Aucune tâche trouvée",
+    "addPlaceholder": "Entrez le titre de la tâche...",
+    "descriptionPlaceholder": "Entrez la description (optionnel)..."
+  },
+  "priority": {
+    "label": "Priorité",
+    "high": "Haute",
+    "medium": "Moyenne",
+    "low": "Basse"
+  },
+  "tags": {
+    "label": "Étiquettes",
+    "placeholder": "Ajouter des étiquettes...",
+    "addTag": "Ajouter une étiquette"
+  },
+  "filter": {
+    "all": "Toutes les Tâches",
+    "completed": "Terminées",
+    "pending": "En attente",
+    "byPriority": "Par Priorité",
+    "byTags": "Par Étiquettes"
+  },
+  "sort": {
+    "label": "Trier par",
+    "createdAt": "Date de Création",
+    "updatedAt": "Date de Mise à jour",
+    "priority": "Priorité",
+    "title": "Titre",
+    "asc": "Croissant",
+    "desc": "Décroissant"
+  },
+  "voice": {
+    "button": "Commande Vocale",
+    "listening": "En écoute...",
+    "notSupported": "La reconnaissance vocale n'est pas supportée dans ce navigateur",
+    "permissionDenied": "Permission du microphone refusée",
+    "error": "Erreur de reconnaissance vocale"
+  },
+  "chat": {
+    "title": "Assistant IA",
+    "placeholder": "Posez-moi n'importe quelle question sur vos tâches...",
+    "send": "Envoyer",
+    "clear": "Effacer l'Historique",
+    "thinking": "Réflexion en cours...",
+    "error": "Échec de l'obtention de la réponse"
+  },
+  "language": {
+    "label": "Langue",
+    "en": "Anglais (English)",
+    "ur": "Ourdou (اردو)",
+    "ar": "Arabe (العربية)",
+    "es": "Espagnol (Español)",
+    "fr": "Français",
+    "de": "Allemand (Deutsch)"
+  },
+  "messages": {
+    "taskCreated": "Tâche créée avec succès",
+    "taskUpdated": "Tâche mise à jour avec succès",
+    "taskDeleted": "Tâche supprimée avec succès",
+    "error": "Une erreur s'est produite",
+    "loading": "Chargement...",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette tâche?"
+  },
+  "validation": {
+    "titleRequired": "Le titre est requis",
+    "titleTooLong": "Le titre est trop long (maximum 200 caractères)",
+    "descriptionTooLong": "La description est trop longue (maximum 2000 caractères)"
+  }
+}

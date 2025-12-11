@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Physische KI-Aufgaben",
+    "subtitle": "Mehrsprachige Aufgaben-App mit Sprache und KI"
+  },
+  "actions": {
+    "add": "Aufgabe Hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "search": "Aufgaben suchen...",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "clear": "Löschen",
+    "close": "Schließen"
+  },
+  "task": {
+    "title": "Titel",
+    "description": "Beschreibung",
+    "completed": "Erledigt",
+    "pending": "Ausstehend",
+    "created": "Erstellt",
+    "updated": "Aktualisiert",
+    "noTasks": "Keine Aufgaben gefunden",
+    "addPlaceholder": "Aufgabentitel eingeben...",
+    "descriptionPlaceholder": "Beschreibung eingeben (optional)..."
+  },
+  "priority": {
+    "label": "Priorität",
+    "high": "Hoch",
+    "medium": "Mittel",
+    "low": "Niedrig"
+  },
+  "tags": {
+    "label": "Tags",
+    "placeholder": "Tags hinzufügen...",
+    "addTag": "Tag hinzufügen"
+  },
+  "filter": {
+    "all": "Alle Aufgaben",
+    "completed": "Erledigt",
+    "pending": "Ausstehend",
+    "byPriority": "Nach Priorität",
+    "byTags": "Nach Tags"
+  },
+  "sort": {
+    "label": "Sortieren nach",
+    "createdAt": "Erstellungsdatum",
+    "updatedAt": "Aktualisierungsdatum",
+    "priority": "Priorität",
+    "title": "Titel",
+    "asc": "Aufsteigend",
+    "desc": "Absteigend"
+  },
+  "voice": {
+    "button": "Sprachbefehl",
+    "listening": "Hört zu...",
+    "notSupported": "Spracherkennung wird in diesem Browser nicht unterstützt",
+    "permissionDenied": "Mikrofon-Berechtigung verweigert",
+    "error": "Fehler bei der Spracherkennung"
+  },
+  "chat": {
+    "title": "KI-Assistent",
+    "placeholder": "Fragen Sie mich alles über Ihre Aufgaben...",
+    "send": "Senden",
+    "clear": "Verlauf Löschen",
+    "thinking": "Denke nach...",
+    "error": "Fehler beim Abrufen der Antwort"
+  },
+  "language": {
+    "label": "Sprache",
+    "en": "Englisch (English)",
+    "ur": "Urdu (اردو)",
+    "ar": "Arabisch (العربية)",
+    "es": "Spanisch (Español)",
+    "fr": "Französisch (Français)",
+    "de": "Deutsch"
+  },
+  "messages": {
+    "taskCreated": "Aufgabe erfolgreich erstellt",
+    "taskUpdated": "Aufgabe erfolgreich aktualisiert",
+    "taskDeleted": "Aufgabe erfolgreich gelöscht",
+    "error": "Ein Fehler ist aufgetreten",
+    "loading": "Lädt...",
+    "confirmDelete": "Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?"
+  },
+  "validation": {
+    "titleRequired": "Titel ist erforderlich",
+    "titleTooLong": "Titel ist zu lang (maximal 200 Zeichen)",
+    "descriptionTooLong": "Beschreibung ist zu lang (maximal 2000 Zeichen)"
+  }
+}

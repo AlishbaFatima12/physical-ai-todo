@@ -66,3 +66,4 @@ htmlcov/
 
 # Local settings
 .claude/settings.local.json
+nul

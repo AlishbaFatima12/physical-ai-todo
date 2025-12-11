@@ -15,13 +15,14 @@ from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate, TaskPatch
 
 
-def create_task(task_data: TaskCreate, session: Session) -> Task:
+def create_task(task_data: TaskCreate, session: Session, user_id: int) -> Task:
     """
     Create a new task in the database.
 
     Args:
         task_data: Task creation data (title, description, priority, tags)
         session: Async database session
+        user_id: ID of the user creating the task
 
     Returns:
         Created Task object with generated ID and timestamps
@@ -31,6 +32,7 @@ def create_task(task_data: TaskCreate, session: Session) -> Task:
 
     # Create new task instance
     db_task = Task(
+        user_id=user_id,
         title=task_data.title,
         description=task_data.description,
         priority=task_data.priority,
@@ -49,6 +51,7 @@ def create_task(task_data: TaskCreate, session: Session) -> Task:
 
 def list_tasks(
     session: Session,
+    user_id: int,
     limit: int = 50,
     offset: int = 0,
     search: Optional[str] = None,
@@ -75,8 +78,8 @@ def list_tasks(
     Returns:
         Tuple of (list of tasks, total count)
     """
-    # Build base query
-    query = select(Task)
+    # Build base query with user_id filter
+    query = select(Task).where(Task.user_id == user_id)
 
     # Apply filters
     if search:

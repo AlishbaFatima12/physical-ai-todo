@@ -12,7 +12,7 @@ export interface Task {
   description?: string
   completed: boolean
   priority: Priority
-  tags?: string
+  tags: string[]  // Array of tag strings
   display_order: number
   is_template: boolean
   created_at: string
@@ -96,7 +96,7 @@ export interface TaskCreate {
   title: string
   description?: string
   priority?: Priority
-  tags?: string
+  tags?: string[]  // Array of tag strings
   display_order?: number
 }
 
@@ -105,7 +105,7 @@ export interface TaskUpdate {
   description?: string
   completed?: boolean
   priority?: Priority
-  tags?: string
+  tags?: string[]  // Array of tag strings
   display_order?: number
 }
 

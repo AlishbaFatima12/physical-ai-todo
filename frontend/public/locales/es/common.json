@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Todo con IA Física",
+    "subtitle": "Aplicación de tareas multiidioma con voz e IA"
+  },
+  "actions": {
+    "add": "Agregar Tarea",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "search": "Buscar tareas...",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "clear": "Limpiar",
+    "close": "Cerrar"
+  },
+  "task": {
+    "title": "Título",
+    "description": "Descripción",
+    "completed": "Completada",
+    "pending": "Pendiente",
+    "created": "Creada",
+    "updated": "Actualizada",
+    "noTasks": "No se encontraron tareas",
+    "addPlaceholder": "Ingrese el título de la tarea...",
+    "descriptionPlaceholder": "Ingrese la descripción (opcional)..."
+  },
+  "priority": {
+    "label": "Prioridad",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja"
+  },
+  "tags": {
+    "label": "Etiquetas",
+    "placeholder": "Agregar etiquetas...",
+    "addTag": "Agregar etiqueta"
+  },
+  "filter": {
+    "all": "Todas las Tareas",
+    "completed": "Completadas",
+    "pending": "Pendientes",
+    "byPriority": "Por Prioridad",
+    "byTags": "Por Etiquetas"
+  },
+  "sort": {
+    "label": "Ordenar por",
+    "createdAt": "Fecha de Creación",
+    "updatedAt": "Fecha de Actualización",
+    "priority": "Prioridad",
+    "title": "Título",
+    "asc": "Ascendente",
+    "desc": "Descendente"
+  },
+  "voice": {
+    "button": "Comando de Voz",
+    "listening": "Escuchando...",
+    "notSupported": "El reconocimiento de voz no está soportado en este navegador",
+    "permissionDenied": "Permiso de micrófono denegado",
+    "error": "Error en el reconocimiento de voz"
+  },
+  "chat": {
+    "title": "Asistente IA",
+    "placeholder": "Pregúntame cualquier cosa sobre tus tareas...",
+    "send": "Enviar",
+    "clear": "Limpiar Historial",
+    "thinking": "Pensando...",
+    "error": "Error al obtener respuesta"
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "Inglés (English)",
+    "ur": "Urdu (اردو)",
+    "ar": "Árabe (العربية)",
+    "es": "Español",
+    "fr": "Francés (Français)",
+    "de": "Alemán (Deutsch)"
+  },
+  "messages": {
+    "taskCreated": "Tarea creada exitosamente",
+    "taskUpdated": "Tarea actualizada exitosamente",
+    "taskDeleted": "Tarea eliminada exitosamente",
+    "error": "Ocurrió un error",
+    "loading": "Cargando...",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta tarea?"
+  },
+  "validation": {
+    "titleRequired": "El título es requerido",
+    "titleTooLong": "El título es demasiado largo (máximo 200 caracteres)",
+    "descriptionTooLong": "La descripción es demasiado larga (máximo 2000 caracteres)"
+  }
+}
