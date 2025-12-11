@@ -60,8 +60,11 @@ def register(
 ):
     """Register a new user and send verification email"""
 
+    # Normalize email to lowercase for case-insensitive comparison
+    normalized_email = user_data.email.lower()
+
     # Check if user already exists
-    result = session.execute(select(User).where(User.email == user_data.email))
+    result = session.execute(select(User).where(User.email == normalized_email))
     existing_user = result.scalar_one_or_none()
 
     if existing_user:
@@ -75,7 +78,7 @@ def register(
 
     # Create new user
     new_user = User(
-        email=user_data.email,
+        email=normalized_email,  # Store normalized (lowercase) email
         hashed_password=hash_password(user_data.password),
         full_name=user_data.full_name,
         is_active=False,  # Not active until verified
@@ -107,8 +110,11 @@ def login(
 ):
     """Login user and return JWT token in cookie"""
 
+    # Normalize email to lowercase for case-insensitive comparison
+    normalized_email = user_data.email.lower()
+
     # Find user by email
-    result = session.execute(select(User).where(User.email == user_data.email))
+    result = session.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(user_data.password, user.hashed_password):
@@ -206,7 +212,10 @@ def resend_verification(
 ):
     """Resend verification email"""
 
-    result = session.execute(select(User).where(User.email == email))
+    # Normalize email to lowercase
+    normalized_email = email.lower()
+
+    result = session.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
 
     if not user:
@@ -344,8 +353,11 @@ async def github_callback(
                 detail="No verified primary email found on GitHub account"
             )
 
+    # Normalize email to lowercase
+    normalized_email = primary_email.lower()
+
     # Check if user exists
-    result = session.execute(select(User).where(User.email == primary_email))
+    result = session.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
 
     if user:
@@ -362,7 +374,7 @@ async def github_callback(
         # Create new user
         random_password = secrets.token_urlsafe(32)
         user = User(
-            email=primary_email,
+            email=normalized_email,  # Use normalized email
             hashed_password=hash_password(random_password),  # Random password for OAuth users
             full_name=github_user.get("name") or github_user.get("login"),
             is_active=True,
