@@ -43,7 +43,17 @@ export default function VerifyEmailPage() {
       } else {
         const error = await response.json()
         setStatus('error')
-        setMessage(error.detail || 'Verification failed')
+        // Handle all error formats properly
+        let errorMsg = 'Verification failed'
+        if (Array.isArray(error.detail)) {
+          const firstError = error.detail[0]
+          errorMsg = typeof firstError === 'object' ? (firstError.msg || JSON.stringify(firstError)) : String(firstError)
+        } else if (typeof error.detail === 'string') {
+          errorMsg = error.detail
+        } else if (typeof error.detail === 'object' && error.detail !== null) {
+          errorMsg = JSON.stringify(error.detail)
+        }
+        setMessage(errorMsg)
       }
     } catch (error) {
       setStatus('error')
@@ -70,7 +80,17 @@ export default function VerifyEmailPage() {
         setMessage('Verification email sent! Check your inbox.')
       } else {
         const error = await response.json()
-        setMessage(error.detail || 'Failed to resend email')
+        // Handle all error formats properly
+        let errorMsg = 'Failed to resend email'
+        if (Array.isArray(error.detail)) {
+          const firstError = error.detail[0]
+          errorMsg = typeof firstError === 'object' ? (firstError.msg || JSON.stringify(firstError)) : String(firstError)
+        } else if (typeof error.detail === 'string') {
+          errorMsg = error.detail
+        } else if (typeof error.detail === 'object' && error.detail !== null) {
+          errorMsg = JSON.stringify(error.detail)
+        }
+        setMessage(errorMsg)
       }
     } catch (error) {
       setMessage('Failed to resend email. Please try again.')
