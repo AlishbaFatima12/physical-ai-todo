@@ -65,9 +65,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(error.detail)) {
         // Pydantic validation error - extract first error message
         const firstError = error.detail[0]
-        throw new Error(firstError.msg || 'Validation failed')
+        const errorMsg = typeof firstError === 'object' ? (firstError.msg || JSON.stringify(firstError)) : String(firstError)
+        throw new Error(errorMsg)
       } else if (typeof error.detail === 'string') {
         throw new Error(error.detail)
+      } else if (typeof error.detail === 'object' && error.detail !== null) {
+        // Handle object error details
+        throw new Error(JSON.stringify(error.detail))
       } else {
         throw new Error('Login failed')
       }
@@ -75,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await response.json()
     setUser(data.user)
-    router.push('/')
+    router.push('/dashboard')
   }
 
   const register = async (email: string, password: string, fullName: string) => {
@@ -95,9 +99,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(error.detail)) {
         // Pydantic validation error - extract first error message
         const firstError = error.detail[0]
-        throw new Error(firstError.msg || 'Validation failed')
+        const errorMsg = typeof firstError === 'object' ? (firstError.msg || JSON.stringify(firstError)) : String(firstError)
+        throw new Error(errorMsg)
       } else if (typeof error.detail === 'string') {
         throw new Error(error.detail)
+      } else if (typeof error.detail === 'object' && error.detail !== null) {
+        // Handle object error details
+        throw new Error(JSON.stringify(error.detail))
       } else {
         throw new Error('Registration failed')
       }
