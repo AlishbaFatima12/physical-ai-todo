@@ -12,7 +12,12 @@ from sqlmodel import Session
 
 from app import crud
 from app.database import get_session
-from app.schemas import TaskCreate, TaskUpdate, TaskPatch, TaskRead, TaskListResponse
+from app.schemas import (
+    TaskCreate, TaskUpdate, TaskPatch, TaskRead, TaskListResponse,
+    BulkOperationRequest, BulkTagRequest, BulkPriorityRequest, ReorderRequest
+)
+from app.auth.dependencies import get_current_user
+from app.models import User
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
 
@@ -27,6 +32,7 @@ def get_tasks(
     tags: Optional[str] = Query(None, description="Comma-separated tags to filter by"),
     sort: str = Query("created_at", pattern="^(created_at|updated_at|priority|title)$", description="Sort field"),
     order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -49,6 +55,7 @@ def get_tasks(
     """
     tasks, total = crud.list_tasks(
         session=session,
+        user_id=current_user.id,
         limit=limit,
         offset=offset,
         search=search,
@@ -80,6 +87,7 @@ def get_tasks(
 @router.post("", response_model=TaskRead, status_code=201)
 def create_task(
     task_data: TaskCreate,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -94,7 +102,7 @@ def create_task(
     **Returns:**
     - Created task with ID and timestamps
     """
-    db_task = crud.create_task(task_data, session)
+    db_task = crud.create_task(task_data, session, user_id=current_user.id)
 
     # Parse tags from JSON string
     return TaskRead(
@@ -112,6 +120,7 @@ def create_task(
 @router.get("/{task_id}", response_model=TaskRead)
 def get_task(
     task_id: int,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -127,7 +136,7 @@ def get_task(
     - 404: Task not found
     """
     db_task = crud.get_task(task_id, session)
-    if not db_task:
+    if not db_task or db_task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
     return TaskRead(
@@ -146,6 +155,7 @@ def get_task(
 def update_task(
     task_id: int,
     task_data: TaskUpdate,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -163,6 +173,11 @@ def update_task(
     **Raises:**
     - 404: Task not found
     """
+    # Verify ownership
+    existing_task = crud.get_task(task_id, session)
+    if not existing_task or existing_task.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
+
     db_task = crud.update_task(task_id, task_data, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
@@ -183,6 +198,7 @@ def update_task(
 def patch_task(
     task_id: int,
     task_data: TaskPatch,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -205,6 +221,11 @@ def patch_task(
     **Raises:**
     - 404: Task not found
     """
+    # Verify ownership
+    existing_task = crud.get_task(task_id, session)
+    if not existing_task or existing_task.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
+
     db_task = crud.patch_task(task_id, task_data, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
@@ -224,6 +245,7 @@ def patch_task(
 @router.delete("/{task_id}", status_code=204)
 def delete_task(
     task_id: int,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -238,6 +260,11 @@ def delete_task(
     **Raises:**
     - 404: Task not found
     """
+    # Verify ownership
+    existing_task = crud.get_task(task_id, session)
+    if not existing_task or existing_task.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
+
     deleted = crud.delete_task(task_id, session)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
@@ -248,6 +275,7 @@ def delete_task(
 @router.post("/{task_id}/toggle", response_model=TaskRead)
 def toggle_task_completion(
     task_id: int,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """
@@ -262,6 +290,11 @@ def toggle_task_completion(
     **Raises:**
     - 404: Task not found
     """
+    # Verify ownership
+    existing_task = crud.get_task(task_id, session)
+    if not existing_task or existing_task.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
+
     db_task = crud.toggle_complete(task_id, session)
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
@@ -276,3 +309,234 @@ def toggle_task_completion(
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
+
+
+# ============================================================================
+# Bulk Operations and Reorder Endpoints (US5: Interactive Management)
+# ============================================================================
+
+@router.post("/reorder")
+def reorder_tasks(
+    request: ReorderRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Reorder tasks by updating display_order for multiple tasks.
+
+    **Request Body:**
+    ```json
+    {
+      "items": [
+        {"id": 1, "display_order": 0},
+        {"id": 2, "display_order": 1},
+        {"id": 3, "display_order": 2}
+      ]
+    }
+    ```
+
+    **Returns:**
+    - Success message with count of updated tasks
+
+    **Raises:**
+    - 400: Invalid request (empty items list)
+    - 403: User doesn't own one or more tasks
+    """
+    if not request.items:
+        raise HTTPException(status_code=400, detail="Items list cannot be empty")
+
+    # Extract task IDs
+    task_ids = [item["id"] for item in request.items]
+
+    # Verify ownership of all tasks
+    for task_id in task_ids:
+        task = crud.get_task(task_id, session)
+        if not task or task.user_id != current_user.id:
+            raise HTTPException(status_code=403, detail=f"Task {task_id} not found or access denied")
+
+    # Update display_order for each task
+    updated_count = 0
+    for item in request.items:
+        task = crud.patch_task(
+            item["id"],
+            TaskPatch(display_order=item["display_order"]),
+            session
+        )
+        if task:
+            updated_count += 1
+
+    return {
+        "success": True,
+        "updated_count": updated_count,
+        "message": f"Reordered {updated_count} tasks"
+    }
+
+
+@router.post("/bulk/complete")
+def bulk_complete_tasks(
+    request: BulkOperationRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Mark multiple tasks as completed.
+
+    **Request Body:**
+    ```json
+    {
+      "task_ids": [1, 2, 3, 4, 5]
+    }
+    ```
+
+    **Returns:**
+    - Success message with count of updated tasks
+
+    **Raises:**
+    - 400: Invalid request (empty task_ids)
+    """
+    if not request.task_ids:
+        raise HTTPException(status_code=400, detail="task_ids cannot be empty")
+
+    updated_count = 0
+    for task_id in request.task_ids:
+        # Verify ownership
+        task = crud.get_task(task_id, session)
+        if task and task.user_id == current_user.id:
+            # Mark as completed
+            crud.patch_task(task_id, TaskPatch(completed=True), session)
+            updated_count += 1
+
+    return {
+        "success": True,
+        "updated_count": updated_count,
+        "message": f"Completed {updated_count} tasks"
+    }
+
+
+@router.post("/bulk/delete")
+def bulk_delete_tasks(
+    request: BulkOperationRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Delete multiple tasks.
+
+    **Request Body:**
+    ```json
+    {
+      "task_ids": [1, 2, 3]
+    }
+    ```
+
+    **Returns:**
+    - Success message with count of deleted tasks
+
+    **Raises:**
+    - 400: Invalid request (empty task_ids)
+    """
+    if not request.task_ids:
+        raise HTTPException(status_code=400, detail="task_ids cannot be empty")
+
+    deleted_count = 0
+    for task_id in request.task_ids:
+        # Verify ownership
+        task = crud.get_task(task_id, session)
+        if task and task.user_id == current_user.id:
+            crud.delete_task(task_id, session)
+            deleted_count += 1
+
+    return {
+        "success": True,
+        "deleted_count": deleted_count,
+        "message": f"Deleted {deleted_count} tasks"
+    }
+
+
+@router.post("/bulk/tag")
+def bulk_add_tag(
+    request: BulkTagRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Add a tag to multiple tasks.
+
+    **Request Body:**
+    ```json
+    {
+      "task_ids": [1, 2, 3],
+      "tag": "urgent"
+    }
+    ```
+
+    **Returns:**
+    - Success message with count of updated tasks
+
+    **Raises:**
+    - 400: Invalid request (empty task_ids or tag)
+    """
+    if not request.task_ids:
+        raise HTTPException(status_code=400, detail="task_ids cannot be empty")
+    if not request.tag:
+        raise HTTPException(status_code=400, detail="tag cannot be empty")
+
+    updated_count = 0
+    for task_id in request.task_ids:
+        # Verify ownership
+        task = crud.get_task(task_id, session)
+        if task and task.user_id == current_user.id:
+            # Get existing tags
+            existing_tags = json.loads(task.tags) if task.tags else []
+            # Add new tag if not already present
+            if request.tag not in existing_tags:
+                existing_tags.append(request.tag)
+                crud.patch_task(task_id, TaskPatch(tags=existing_tags), session)
+                updated_count += 1
+
+    return {
+        "success": True,
+        "updated_count": updated_count,
+        "message": f"Added tag '{request.tag}' to {updated_count} tasks"
+    }
+
+
+@router.post("/bulk/priority")
+def bulk_set_priority(
+    request: BulkPriorityRequest,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    """
+    Set priority for multiple tasks.
+
+    **Request Body:**
+    ```json
+    {
+      "task_ids": [1, 2, 3],
+      "priority": "high"
+    }
+    ```
+
+    **Returns:**
+    - Success message with count of updated tasks
+
+    **Raises:**
+    - 400: Invalid request (empty task_ids)
+    """
+    if not request.task_ids:
+        raise HTTPException(status_code=400, detail="task_ids cannot be empty")
+
+    updated_count = 0
+    for task_id in request.task_ids:
+        # Verify ownership
+        task = crud.get_task(task_id, session)
+        if task and task.user_id == current_user.id:
+            crud.patch_task(task_id, TaskPatch(priority=request.priority), session)
+            updated_count += 1
+
+    return {
+        "success": True,
+        "updated_count": updated_count,
+        "message": f"Set priority to '{request.priority}' for {updated_count} tasks"
+    }
