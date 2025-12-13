@@ -1,93 +1,112 @@
 {
   "app": {
-    "title": "فزیکل اے آئی ٹوڈو",
-    "subtitle": "آواز اور اے آئی کے ساتھ کثیر لسانی ٹوڈو ایپلیکیشن"
+    "title": "فلو ٹاسک",
+    "subtitle": "آسان پیداواری صلاحیت، خوبصورت ڈیزائن"
   },
-  "actions": {
-    "add": "کام شامل کریں",
+  "dashboard": {
+    "stats": {
+      "total": "کل",
+      "active": "فعال",
+      "completed": "مکمل"
+    },
+    "createTask": "نیا کام بنائیں",
+    "yourTasks": "آپ کے کام"
+  },
+  "filters": {
+    "title": "فلٹرز اور تلاش",
+    "clearAll": "تمام صاف کریں",
+    "search": "تلاش کریں",
+    "searchPlaceholder": "کام تلاش کریں...",
+    "priority": "ترجیح",
+    "allPriorities": "تمام ترجیحات",
+    "highPriority": "زیادہ ترجیح",
+    "mediumPriority": "درمیانی ترجیح",
+    "lowPriority": "کم ترجیح",
+    "status": "حالت",
+    "allTasks": "تمام کام",
+    "activeOnly": "صرف فعال",
+    "completedOnly": "صرف مکمل",
+    "tags": "ٹیگز",
+    "tagsPlaceholder": "کام،فوری (کوما سے الگ)",
+    "sortBy": "ترتیب دیں",
+    "dateCreated": "تخلیق کی تاریخ",
+    "dateUpdated": "اپڈیٹ کی تاریخ",
+    "titleAZ": "عنوان (الف سے ی)",
+    "order": "ترتیب",
+    "descending": "نزولی",
+    "ascending": "صعودی"
+  },
+  "taskForm": {
+    "editTask": "کام میں ترمیم کریں",
+    "createTask": "نیا کام بنائیں",
+    "title": "عنوان",
+    "titlePlaceholder": "کام کا عنوان درج کریں...",
+    "description": "تفصیل",
+    "descriptionPlaceholder": "کام کی تفصیل درج کریں...",
+    "priority": "ترجیح",
+    "lowPriority": "کم ترجیح",
+    "mediumPriority": "درمیانی ترجیح",
+    "highPriority": "زیادہ ترجیح",
+    "tags": "ٹیگز",
+    "tagsPlaceholder": "ٹیگز شامل کریں (Enter دبائیں)...",
+    "addTag": "شامل کریں",
+    "saving": "محفوظ ہو رہا ہے...",
+    "updateTask": "کام اپڈیٹ کریں",
+    "createTaskButton": "کام بنائیں",
+    "cancel": "منسوخ کریں",
+    "titleRequired": "براہ مہربانی کام کا عنوان درج کریں",
+    "saveFailed": "کام محفوظ کرنے میں ناکام۔ براہ مہربانی دوبارہ کوشش کریں۔"
+  },
+  "taskList": {
+    "noTasks": "کوئی کام نہیں ملا",
+    "noTasksDesc": "اوپر ایک نیا کام بنا کر شروع کریں!"
+  },
+  "taskItem": {
+    "high": "زیادہ ترجیح",
+    "medium": "درمیانی",
+    "low": "کم",
+    "created": "بنایا گیا:",
+    "updated": "اپڈیٹ کیا گیا:",
     "edit": "ترمیم کریں",
     "delete": "حذف کریں",
-    "save": "محفوظ کریں",
-    "cancel": "منسوخ کریں",
-    "search": "کام تلاش کریں...",
-    "filter": "فلٹر کریں",
-    "sort": "ترتیب دیں",
-    "clear": "صاف کریں",
-    "close": "بند کریں"
+    "deleting": "حذف ہو رہا ہے...",
+    "deleteConfirm": "کیا آپ واقعی یہ کام حذف کرنا چاہتے ہیں؟",
+    "updateFailed": "کام اپڈیٹ کرنے میں ناکام",
+    "deleteFailed": "کام حذف کرنے میں ناکام"
   },
-  "task": {
-    "title": "عنوان",
-    "description": "تفصیل",
-    "completed": "مکمل",
-    "pending": "زیر التواء",
-    "created": "بنایا گیا",
-    "updated": "اپ ڈیٹ کیا گیا",
-    "noTasks": "کوئی کام نہیں ملا",
-    "addPlaceholder": "کام کا عنوان درج کریں...",
-    "descriptionPlaceholder": "تفصیل درج کریں (اختیاری)..."
+  "landing": {
+    "hero": {
+      "title1": "آسان پیداواری صلاحیت،",
+      "title2": "خوبصورت ڈیزائن",
+      "subtitle": "ٹاسک مینجمنٹ کا مستقبل تجربہ کریں",
+      "cta": "اپنا مفت سفر شروع کریں →"
+    },
+    "nav": {
+      "signin": "سائن ان کریں",
+      "getStarted": "مفت شروع کریں"
+    },
+    "footer": {
+      "subtitle": "آسان پیداواری صلاحیت، خوبصورت ڈیزائن",
+      "poweredBy": "تیار کردہ",
+      "author": "سیدہ علیشبا فاطمہ",
+      "copyright": "© 2025 فلو ٹاسک۔ تمام حقوق محفوظ ہیں۔"
+    }
   },
-  "priority": {
-    "label": "ترجیح",
-    "high": "زیادہ",
-    "medium": "درمیانہ",
-    "low": "کم"
-  },
-  "tags": {
-    "label": "ٹیگز",
-    "placeholder": "ٹیگ شامل کریں...",
-    "addTag": "ٹیگ شامل کریں"
-  },
-  "filter": {
-    "all": "تمام کام",
-    "completed": "مکمل شدہ",
-    "pending": "زیر التواء",
-    "byPriority": "ترجیح کے مطابق",
-    "byTags": "ٹیگز کے مطابق"
-  },
-  "sort": {
-    "label": "ترتیب دیں",
-    "createdAt": "تخلیق کی تاریخ",
-    "updatedAt": "اپ ڈیٹ کی تاریخ",
-    "priority": "ترجیح",
-    "title": "عنوان",
-    "asc": "چڑھتی ترتیب",
-    "desc": "اترتی ترتیب"
-  },
-  "voice": {
-    "button": "صوتی کمانڈ",
-    "listening": "سن رہا ہے...",
-    "notSupported": "اس براؤزر میں آواز کی پہچان کی سہولت دستیاب نہیں",
-    "permissionDenied": "مائیکروفون کی اجازت مسترد کر دی گئی",
-    "error": "آواز کی پہچان میں خرابی"
-  },
-  "chat": {
-    "title": "اے آئی معاون",
-    "placeholder": "اپنے کاموں کے بارے میں کچھ بھی پوچھیں...",
-    "send": "بھیجیں",
-    "clear": "تاریخ صاف کریں",
-    "thinking": "سوچ رہا ہے...",
-    "error": "جواب حاصل کرنے میں ناکام"
-  },
-  "language": {
-    "label": "زبان",
-    "en": "انگریزی (English)",
-    "ur": "اردو",
-    "ar": "عربی (العربية)",
-    "es": "ہسپانوی (Español)",
-    "fr": "فرانسیسی (Français)",
-    "de": "جرمن (Deutsch)"
-  },
-  "messages": {
-    "taskCreated": "کام کامیابی سے بنایا گیا",
-    "taskUpdated": "کام کامیابی سے اپ ڈیٹ کیا گیا",
-    "taskDeleted": "کام کامیابی سے حذف کیا گیا",
-    "error": "ایک خرابی پیش آئی",
-    "loading": "لوڈ ہو رہا ہے...",
-    "confirmDelete": "کیا آپ واقعی اس کام کو حذف کرنا چاہتے ہیں؟"
-  },
-  "validation": {
-    "titleRequired": "عنوان ضروری ہے",
-    "titleTooLong": "عنوان بہت لمبا ہے (زیادہ سے زیادہ 200 حروف)",
-    "descriptionTooLong": "تفصیل بہت لمبی ہے (زیادہ سے زیادہ 2000 حروف)"
+  "auth": {
+    "signin": {
+      "title": "اپنے اکاؤنٹ میں سائن ان کریں",
+      "email": "ای میل ایڈریس",
+      "password": "پاس ورڈ",
+      "button": "سائن ان",
+      "loading": "سائن ان ہو رہا ہے...",
+      "github": "GitHub کے ساتھ جاری رکھیں",
+      "noAccount": "اکاؤنٹ نہیں ہے؟",
+      "signupLink": "مفت سائن اپ کریں",
+      "divider": "یا جاری رکھیں"
+    },
+    "footer": {
+      "poweredBy": "تیار کردہ",
+      "author": "سیدہ علیشبا فاطمہ"
+    }
   }
 }

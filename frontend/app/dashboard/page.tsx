@@ -9,8 +9,10 @@ import FilterBar from '@/components/FilterBar'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { Task } from '@/lib/types'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function Home() {
+  const { t } = useI18n()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [showForm, setShowForm] = useState(false)
 
@@ -69,10 +71,10 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div className="text-center flex-grow">
             <h1 className="text-5xl font-bold text-white mb-2">
-              FlowTask
+              {t('app.title')}
             </h1>
             <p className="text-white text-opacity-90">
-              Effortless Productivity, Beautiful Design
+              {t('app.subtitle')}
             </p>
           </div>
           <div className="absolute top-6 right-6 flex items-center gap-3">
@@ -86,19 +88,19 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-3xl font-bold text-white">{data?.total || 0}</div>
-              <div className="text-white text-opacity-75 text-sm">Total</div>
+              <div className="text-white text-opacity-75 text-sm">{t('dashboard.stats.total')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-white">
-                {tasks.filter((t) => !t.completed).length}
+                {tasks.filter((task) => !task.completed).length}
               </div>
-              <div className="text-white text-opacity-75 text-sm">Active</div>
+              <div className="text-white text-opacity-75 text-sm">{t('dashboard.stats.active')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-white">
-                {tasks.filter((t) => t.completed).length}
+                {tasks.filter((task) => task.completed).length}
               </div>
-              <div className="text-white text-opacity-75 text-sm">Completed</div>
+              <div className="text-white text-opacity-75 text-sm">{t('dashboard.stats.completed')}</div>
             </div>
           </div>
         </div>
@@ -147,7 +149,7 @@ export default function Home() {
                 />
               </svg>
               <span className="text-xl font-semibold text-gray-700">
-                Create New Task
+                {t('dashboard.createTask')}
               </span>
             </div>
           </button>
@@ -155,7 +157,7 @@ export default function Home() {
 
         {/* Task List */}
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 shadow-xl">
-          <h2 className="text-2xl font-bold text-white mb-4">Your Tasks</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">{t('dashboard.yourTasks')}</h2>
           <TaskList
             tasks={tasks}
             isLoading={isLoading}

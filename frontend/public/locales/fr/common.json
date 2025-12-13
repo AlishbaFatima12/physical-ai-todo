@@ -1,93 +1,112 @@
 {
   "app": {
-    "title": "Todo IA Physique",
-    "subtitle": "Application de tâches multilingue avec voix et IA"
+    "title": "FlowTask",
+    "subtitle": "Productivité Sans Effort, Design Magnifique"
   },
-  "actions": {
-    "add": "Ajouter une Tâche",
+  "dashboard": {
+    "stats": {
+      "total": "Total",
+      "active": "Actif",
+      "completed": "Terminé"
+    },
+    "createTask": "Créer une Nouvelle Tâche",
+    "yourTasks": "Vos Tâches"
+  },
+  "filters": {
+    "title": "Filtres et Recherche",
+    "clearAll": "Effacer Tout",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher les tâches...",
+    "priority": "Priorité",
+    "allPriorities": "Toutes les Priorités",
+    "highPriority": "Priorité Élevée",
+    "mediumPriority": "Priorité Moyenne",
+    "lowPriority": "Priorité Basse",
+    "status": "Statut",
+    "allTasks": "Toutes les Tâches",
+    "activeOnly": "Actives Uniquement",
+    "completedOnly": "Terminées Uniquement",
+    "tags": "Étiquettes",
+    "tagsPlaceholder": "travail,urgent (séparées par des virgules)",
+    "sortBy": "Trier par",
+    "dateCreated": "Date de Création",
+    "dateUpdated": "Date de Mise à Jour",
+    "titleAZ": "Titre (A-Z)",
+    "order": "Ordre",
+    "descending": "Décroissant",
+    "ascending": "Croissant"
+  },
+  "taskForm": {
+    "editTask": "Modifier la Tâche",
+    "createTask": "Créer une Nouvelle Tâche",
+    "title": "Titre",
+    "titlePlaceholder": "Entrez le titre de la tâche...",
+    "description": "Description",
+    "descriptionPlaceholder": "Entrez la description de la tâche...",
+    "priority": "Priorité",
+    "lowPriority": "Priorité Basse",
+    "mediumPriority": "Priorité Moyenne",
+    "highPriority": "Priorité Élevée",
+    "tags": "Étiquettes",
+    "tagsPlaceholder": "Ajouter des étiquettes (appuyez sur Entrée)...",
+    "addTag": "Ajouter",
+    "saving": "Enregistrement en cours...",
+    "updateTask": "Mettre à Jour la Tâche",
+    "createTaskButton": "Créer la Tâche",
+    "cancel": "Annuler",
+    "titleRequired": "Veuillez entrer un titre de tâche",
+    "saveFailed": "Échec de l'enregistrement de la tâche. Veuillez réessayer."
+  },
+  "taskList": {
+    "noTasks": "Aucune tâche trouvée",
+    "noTasksDesc": "Commencez par créer une nouvelle tâche ci-dessus!"
+  },
+  "taskItem": {
+    "high": "Priorité Élevée",
+    "medium": "Moyen",
+    "low": "Basse",
+    "created": "Créée:",
+    "updated": "Mise à Jour:",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "save": "Enregistrer",
-    "cancel": "Annuler",
-    "search": "Rechercher des tâches...",
-    "filter": "Filtrer",
-    "sort": "Trier",
-    "clear": "Effacer",
-    "close": "Fermer"
+    "deleting": "Suppression en cours...",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche?",
+    "updateFailed": "Échec de la mise à jour de la tâche",
+    "deleteFailed": "Échec de la suppression de la tâche"
   },
-  "task": {
-    "title": "Titre",
-    "description": "Description",
-    "completed": "Terminée",
-    "pending": "En attente",
-    "created": "Créée",
-    "updated": "Mise à jour",
-    "noTasks": "Aucune tâche trouvée",
-    "addPlaceholder": "Entrez le titre de la tâche...",
-    "descriptionPlaceholder": "Entrez la description (optionnel)..."
+  "landing": {
+    "hero": {
+      "title1": "Productivité Sans Effort,",
+      "title2": "Design Magnifique",
+      "subtitle": "Découvrez l'avenir de la gestion des tâches",
+      "cta": "Commencez Votre Voyage Gratuit →"
+    },
+    "nav": {
+      "signin": "Se Connecter",
+      "getStarted": "Commencer Gratuitement"
+    },
+    "footer": {
+      "subtitle": "Productivité Sans Effort, Design Magnifique",
+      "poweredBy": "Propulsé par",
+      "author": "Syeda Alishba Fatima",
+      "copyright": "© 2025 FlowTask. Tous droits réservés."
+    }
   },
-  "priority": {
-    "label": "Priorité",
-    "high": "Haute",
-    "medium": "Moyenne",
-    "low": "Basse"
-  },
-  "tags": {
-    "label": "Étiquettes",
-    "placeholder": "Ajouter des étiquettes...",
-    "addTag": "Ajouter une étiquette"
-  },
-  "filter": {
-    "all": "Toutes les Tâches",
-    "completed": "Terminées",
-    "pending": "En attente",
-    "byPriority": "Par Priorité",
-    "byTags": "Par Étiquettes"
-  },
-  "sort": {
-    "label": "Trier par",
-    "createdAt": "Date de Création",
-    "updatedAt": "Date de Mise à jour",
-    "priority": "Priorité",
-    "title": "Titre",
-    "asc": "Croissant",
-    "desc": "Décroissant"
-  },
-  "voice": {
-    "button": "Commande Vocale",
-    "listening": "En écoute...",
-    "notSupported": "La reconnaissance vocale n'est pas supportée dans ce navigateur",
-    "permissionDenied": "Permission du microphone refusée",
-    "error": "Erreur de reconnaissance vocale"
-  },
-  "chat": {
-    "title": "Assistant IA",
-    "placeholder": "Posez-moi n'importe quelle question sur vos tâches...",
-    "send": "Envoyer",
-    "clear": "Effacer l'Historique",
-    "thinking": "Réflexion en cours...",
-    "error": "Échec de l'obtention de la réponse"
-  },
-  "language": {
-    "label": "Langue",
-    "en": "Anglais (English)",
-    "ur": "Ourdou (اردو)",
-    "ar": "Arabe (العربية)",
-    "es": "Espagnol (Español)",
-    "fr": "Français",
-    "de": "Allemand (Deutsch)"
-  },
-  "messages": {
-    "taskCreated": "Tâche créée avec succès",
-    "taskUpdated": "Tâche mise à jour avec succès",
-    "taskDeleted": "Tâche supprimée avec succès",
-    "error": "Une erreur s'est produite",
-    "loading": "Chargement...",
-    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette tâche?"
-  },
-  "validation": {
-    "titleRequired": "Le titre est requis",
-    "titleTooLong": "Le titre est trop long (maximum 200 caractères)",
-    "descriptionTooLong": "La description est trop longue (maximum 2000 caractères)"
+  "auth": {
+    "signin": {
+      "title": "Connectez-vous à votre compte",
+      "email": "Adresse E-mail",
+      "password": "Mot de Passe",
+      "button": "Se Connecter",
+      "loading": "Connexion en cours...",
+      "github": "Continuer avec GitHub",
+      "noAccount": "Pas de compte?",
+      "signupLink": "Inscrivez-vous gratuitement",
+      "divider": "ou continuez avec"
+    },
+    "footer": {
+      "poweredBy": "Propulsé par",
+      "author": "Syeda Alishba Fatima"
+    }
   }
 }

@@ -16,28 +16,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Inline script to prevent dark mode flicker */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('theme') || 'system';
-                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  const resolved = theme === 'system' ? systemTheme : theme;
-                  if (resolved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {
-                  console.error('Theme initialization error:', e);
-                }
-              })();
-            `,
-          }}
-        />
-      </head>
+    <html lang="en" suppressHydrationWarning className="dark">
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
