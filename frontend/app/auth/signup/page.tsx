@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function SignUpPage() {
@@ -13,7 +14,8 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const { register } = useAuth()
+  const { user, isLoading: authLoading, register, logout } = useAuth()
+  const router = useRouter()
 
   const validateForm = () => {
     if (password.length < 8) {
@@ -46,6 +48,62 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleLogoutAndSignup = async () => {
+    await logout()
+    // Page will re-render after logout and show the form
+  }
+
+  // Show loading while checking auth status
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <svg className="animate-spin h-10 w-10 mx-auto mb-4" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // User is already logged in
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="backdrop-blur-xl bg-white bg-opacity-10 border border-white border-opacity-20 rounded-3xl p-8 shadow-2xl text-center">
+            <div className="text-6xl mb-4">✓</div>
+            <h2 className="text-2xl font-bold text-white mb-4">You're Already Signed In</h2>
+            <p className="text-gray-300 mb-2">Signed in as:</p>
+            <p className="text-white font-semibold mb-6">{user.email}</p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                Go to Dashboard
+              </button>
+
+              <button
+                onClick={handleLogoutAndSignup}
+                className="w-full py-3 bg-white bg-opacity-10 border border-white border-opacity-20 text-white font-medium rounded-lg hover:bg-opacity-20 transition-all"
+              >
+                Sign out and create new account
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )
   }
 
   return (
