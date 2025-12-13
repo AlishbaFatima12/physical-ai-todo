@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Task, TaskCreate, Priority } from '@/lib/types'
 import { createTask, updateTask } from '@/lib/api'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface TaskFormProps {
   onSuccess: () => void
@@ -11,6 +12,7 @@ interface TaskFormProps {
 }
 
 export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormProps) {
+  const { t } = useI18n()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<Priority>('medium')
@@ -43,7 +45,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
     e.preventDefault()
 
     if (!title.trim()) {
-      alert('Please enter a task title')
+      alert(t('taskForm.titleRequired'))
       return
     }
 
@@ -80,7 +82,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
       onSuccess()
     } catch (error) {
       console.error('Failed to save task:', error)
-      alert('Failed to save task. Please try again.')
+      alert(t('taskForm.saveFailed'))
     } finally {
       setIsSubmitting(false)
     }
@@ -89,14 +91,14 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
   return (
     <div className="bg-white rounded-xl shadow-xl p-6 mb-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-900">
-        {editingTask ? 'Edit Task' : 'Create New Task'}
+        {editingTask ? t('taskForm.editTask') : t('taskForm.createTask')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Title */}
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-            Title <span className="text-red-500">*</span>
+            {t('taskForm.title')} <span className="text-red-500">*</span>
           </label>
           <input
             id="title"
@@ -104,7 +106,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            placeholder="Enter task title..."
+            placeholder={t('taskForm.titlePlaceholder')}
             maxLength={200}
             required
           />
@@ -113,14 +115,14 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
         {/* Description */}
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
+            {t('taskForm.description')}
           </label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-            placeholder="Enter task description..."
+            placeholder={t('taskForm.descriptionPlaceholder')}
             rows={3}
             maxLength={2000}
           />
@@ -129,7 +131,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
         {/* Priority */}
         <div>
           <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
-            Priority
+            {t('taskForm.priority')}
           </label>
           <select
             id="priority"
@@ -137,16 +139,16 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
             onChange={(e) => setPriority(e.target.value as Priority)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           >
-            <option value="low">Low Priority</option>
-            <option value="medium">Medium Priority</option>
-            <option value="high">High Priority</option>
+            <option value="low">{t('taskForm.lowPriority')}</option>
+            <option value="medium">{t('taskForm.mediumPriority')}</option>
+            <option value="high">{t('taskForm.highPriority')}</option>
           </select>
         </div>
 
         {/* Tags */}
         <div>
           <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-            Tags
+            {t('taskForm.tags')}
           </label>
           <div className="flex gap-2 mb-2">
             <input
@@ -161,14 +163,14 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
                 }
               }}
               className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="Add tags (press Enter)..."
+              placeholder={t('taskForm.tagsPlaceholder')}
             />
             <button
               type="button"
               onClick={handleAddTag}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
             >
-              Add
+              {t('taskForm.addTag')}
             </button>
           </div>
 
@@ -201,7 +203,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
             disabled={isSubmitting}
             className="flex-grow px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Saving...' : editingTask ? 'Update Task' : 'Create Task'}
+            {isSubmitting ? t('taskForm.saving') : editingTask ? t('taskForm.updateTask') : t('taskForm.createTaskButton')}
           </button>
           {editingTask && (
             <button
@@ -209,7 +211,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
               onClick={onCancel}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
             >
-              Cancel
+              {t('taskForm.cancel')}
             </button>
           )}
         </div>

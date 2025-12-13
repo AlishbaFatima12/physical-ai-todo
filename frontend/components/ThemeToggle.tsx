@@ -1,11 +1,24 @@
 'use client'
 
-import { useTheme } from '@/contexts/ThemeContext'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   const isDark = theme === 'dark'
+  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark')
 
   return (
     <motion.button
