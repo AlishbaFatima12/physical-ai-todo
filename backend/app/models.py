@@ -1,5 +1,6 @@
 """SQLModel database models for Physical AI Todo"""
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, Column
+from sqlalchemy import JSON
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -146,4 +147,17 @@ class ChatMessage(SQLModel, table=True):
     role: str = Field(max_length=20)  # user, assistant
     content: str = Field(max_length=10000)
     language: str = Field(max_length=10, index=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+
+class ConversationMessage(SQLModel, table=True):
+    """Conversation message model for Phase III AI chatbot with stateless persistence"""
+    __tablename__ = "conversation_messages"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: int = Field(index=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    role: str = Field(max_length=20)  # user, assistant, system
+    content: str
+    tool_calls: Optional[dict] = Field(default=None, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)

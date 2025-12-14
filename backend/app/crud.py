@@ -11,7 +11,7 @@ from typing import List, Optional, Tuple
 from sqlalchemy import select, func, or_
 from sqlmodel import Session, col
 
-from app.models import Task
+from app.models import Task, ConversationMessage
 from app.schemas import TaskCreate, TaskUpdate, TaskPatch
 
 
@@ -249,3 +249,116 @@ def toggle_complete(task_id: int, session: Session) -> Optional[Task]:
     session.refresh(db_task)
 
     return db_task
+
+
+# ============================================================================
+# Conversation CRUD Operations (Phase III AI Chatbot)
+# ============================================================================
+
+
+def create_conversation_message(
+    db: Session,
+    conversation_id: int,
+    user_id: int,
+    role: str,
+    content: str,
+    tool_calls: Optional[dict] = None
+) -> ConversationMessage:
+    """
+    Create a new conversation message.
+
+    Args:
+        db: Database session
+        conversation_id: Conversation ID
+        user_id: User ID
+        role: Message role (user, assistant, system)
+        content: Message content
+        tool_calls: Optional tool calls data (for assistant messages)
+
+    Returns:
+        Created ConversationMessage object
+    """
+    message = ConversationMessage(
+        conversation_id=conversation_id,
+        user_id=user_id,
+        role=role,
+        content=content,
+        tool_calls=tool_calls,
+        created_at=datetime.utcnow()
+    )
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    return message
+
+
+def get_conversation_history(
+    db: Session,
+    conversation_id: int,
+    limit: int = 20
+) -> List[ConversationMessage]:
+    """
+    Get conversation history with sliding window (last N messages).
+
+    Args:
+        db: Database session
+        conversation_id: Conversation ID
+        limit: Maximum number of messages to return (default: 20)
+
+    Returns:
+        List of ConversationMessage objects in chronological order
+    """
+    query = select(ConversationMessage).where(
+        ConversationMessage.conversation_id == conversation_id
+    ).order_by(
+        ConversationMessage.created_at.desc()
+    ).limit(limit)
+
+    result = db.execute(query)
+    messages = result.scalars().all()
+
+    # Reverse to get chronological order (oldest first)
+    return list(reversed(messages))
+
+
+def get_user_conversations(
+    db: Session,
+    user_id: int,
+    limit: int = 50
+) -> List[dict]:
+    """
+    Get list of user's conversations with metadata.
+
+    Args:
+        db: Database session
+        user_id: User ID
+        limit: Maximum number of conversations to return
+
+    Returns:
+        List of conversation metadata dictionaries
+    """
+    query = select(
+        ConversationMessage.conversation_id,
+        func.count(ConversationMessage.id).label('message_count'),
+        func.max(ConversationMessage.created_at).label('last_message_at'),
+        func.min(ConversationMessage.created_at).label('created_at')
+    ).where(
+        ConversationMessage.user_id == user_id
+    ).group_by(
+        ConversationMessage.conversation_id
+    ).order_by(
+        func.max(ConversationMessage.created_at).desc()
+    ).limit(limit)
+
+    result = db.execute(query)
+    conversations = []
+
+    for row in result:
+        conversations.append({
+            'conversation_id': row.conversation_id,
+            'message_count': row.message_count,
+            'last_message_at': row.last_message_at,
+            'created_at': row.created_at
+        })
+
+    return conversations

@@ -78,6 +78,51 @@ export default function Home() {
             </p>
           </div>
           <div className="absolute top-6 right-6 flex items-center gap-3">
+            {/* AI Chat Button */}
+            <a
+              href="/chat"
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-md rounded-lg p-2.5 transition-all shadow-lg hover:shadow-xl"
+              title="AI Chat Assistant"
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
+            </a>
+
+            {/* Logout Button */}
+            <button
+              onClick={() => {
+                document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                window.location.href = '/auth/signin';
+              }}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-md rounded-lg p-2.5 transition-all shadow-lg hover:shadow-xl"
+              title="Logout"
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </button>
+
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
