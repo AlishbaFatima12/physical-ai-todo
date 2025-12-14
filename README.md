@@ -109,12 +109,15 @@ JWT_SECRET_KEY=your-secret-key-here
 # Email Service (Resend API)
 RESEND_API_KEY=re_your_resend_api_key
 
-# GitHub OAuth (optional)
+# Frontend URL (used for CORS and OAuth callbacks)
+FRONTEND_URL=http://localhost:3001
+
+# GitHub OAuth (optional - see AUTHENTICATION_QUICK_START.md for setup)
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 
 # CORS
-CORS_ORIGINS=http://localhost:3000
+CORS_ORIGINS=http://localhost:3001
 ```
 
 ```bash
@@ -140,7 +143,7 @@ npm install
 npm run dev
 ```
 
-Frontend will run at: **http://localhost:3000**
+Frontend will run at: **http://localhost:3001**
 
 ---
 
@@ -148,10 +151,12 @@ Frontend will run at: **http://localhost:3000**
 
 ### **First Time Setup**
 
-1. **Visit Landing Page**: http://localhost:3000
+1. **Visit Landing Page**: http://localhost:3001
 2. **Sign Up**: Click "Get Started" → Create account with email/password
-3. **Verify Email**: Check console logs for verification link (if RESEND_API_KEY not configured)
-4. **Or Use GitHub**: Sign up with GitHub OAuth (instant verification)
+3. **Verify Email**: Check backend console for verification link (dev mode - no email API key needed!)
+4. **Or Use GitHub**: Set up OAuth credentials (see AUTHENTICATION_QUICK_START.md)
+
+**📋 For Judges**: See **[AUTHENTICATION_QUICK_START.md](./AUTHENTICATION_QUICK_START.md)** for a 2-minute test guide!
 
 ### **Using the App**
 

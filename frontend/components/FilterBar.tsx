@@ -1,6 +1,7 @@
 'use client'
 
 import { Priority } from '@/lib/types'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface FilterBarProps {
   search: string
@@ -33,18 +34,19 @@ export default function FilterBar({
   onTagsChange,
   onClearFilters,
 }: FilterBarProps) {
+  const { t } = useI18n()
   const hasActiveFilters = search || priority || completed !== 'all' || tags
 
   return (
     <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 mb-6 shadow-xl">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold text-white">Filters & Search</h3>
+        <h3 className="text-xl font-semibold text-white">{t('filters.title')}</h3>
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
             className="text-sm text-white bg-white bg-opacity-20 px-3 py-1 rounded-lg hover:bg-opacity-30 transition-colors"
           >
-            Clear All
+            {t('filters.clearAll')}
           </button>
         )}
       </div>
@@ -53,13 +55,13 @@ export default function FilterBar({
         {/* Search */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Search
+            {t('filters.search')}
           </label>
           <input
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search tasks..."
+            placeholder={t('filters.searchPlaceholder')}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-50 focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           />
         </div>
@@ -67,46 +69,46 @@ export default function FilterBar({
         {/* Priority Filter */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Priority
+            {t('filters.priority')}
           </label>
           <select
             value={priority}
             onChange={(e) => onPriorityChange(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           >
-            <option value="" className="text-gray-900">All Priorities</option>
-            <option value="high" className="text-gray-900">High Priority</option>
-            <option value="medium" className="text-gray-900">Medium Priority</option>
-            <option value="low" className="text-gray-900">Low Priority</option>
+            <option value="" className="text-gray-900">{t('filters.allPriorities')}</option>
+            <option value="high" className="text-gray-900">{t('filters.highPriority')}</option>
+            <option value="medium" className="text-gray-900">{t('filters.mediumPriority')}</option>
+            <option value="low" className="text-gray-900">{t('filters.lowPriority')}</option>
           </select>
         </div>
 
         {/* Completion Status */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Status
+            {t('filters.status')}
           </label>
           <select
             value={completed}
             onChange={(e) => onCompletedChange(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           >
-            <option value="all" className="text-gray-900">All Tasks</option>
-            <option value="false" className="text-gray-900">Active Only</option>
-            <option value="true" className="text-gray-900">Completed Only</option>
+            <option value="all" className="text-gray-900">{t('filters.allTasks')}</option>
+            <option value="false" className="text-gray-900">{t('filters.activeOnly')}</option>
+            <option value="true" className="text-gray-900">{t('filters.completedOnly')}</option>
           </select>
         </div>
 
         {/* Tags Filter */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Tags
+            {t('filters.tags')}
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => onTagsChange(e.target.value)}
-            placeholder="work,urgent (comma-separated)"
+            placeholder={t('filters.tagsPlaceholder')}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-50 focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           />
         </div>
@@ -114,32 +116,32 @@ export default function FilterBar({
         {/* Sort Field */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Sort By
+            {t('filters.sortBy')}
           </label>
           <select
             value={sortField}
             onChange={(e) => onSortFieldChange(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           >
-            <option value="created_at" className="text-gray-900">Date Created</option>
-            <option value="updated_at" className="text-gray-900">Date Updated</option>
-            <option value="priority" className="text-gray-900">Priority</option>
-            <option value="title" className="text-gray-900">Title (A-Z)</option>
+            <option value="created_at" className="text-gray-900">{t('filters.dateCreated')}</option>
+            <option value="updated_at" className="text-gray-900">{t('filters.dateUpdated')}</option>
+            <option value="priority" className="text-gray-900">{t('filters.priority')}</option>
+            <option value="title" className="text-gray-900">{t('filters.titleAZ')}</option>
           </select>
         </div>
 
         {/* Sort Order */}
         <div>
           <label className="block text-sm font-medium text-white mb-1">
-            Order
+            {t('filters.order')}
           </label>
           <select
             value={sortOrder}
             onChange={(e) => onSortOrderChange(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
           >
-            <option value="desc" className="text-gray-900">Descending</option>
-            <option value="asc" className="text-gray-900">Ascending</option>
+            <option value="desc" className="text-gray-900">{t('filters.descending')}</option>
+            <option value="asc" className="text-gray-900">{t('filters.ascending')}</option>
           </select>
         </div>
       </div>

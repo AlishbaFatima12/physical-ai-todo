@@ -1,93 +1,112 @@
 {
   "app": {
-    "title": "تطبيق المهام الذكي",
-    "subtitle": "تطبيق مهام متعدد اللغات مع الصوت والذكاء الاصطناعي"
+    "title": "فلو تاسك",
+    "subtitle": "إنتاجية سهلة، تصميم جميل"
   },
-  "actions": {
-    "add": "إضافة مهمة",
+  "dashboard": {
+    "stats": {
+      "total": "الإجمالي",
+      "active": "نشط",
+      "completed": "مكتمل"
+    },
+    "createTask": "إنشاء مهمة جديدة",
+    "yourTasks": "مهامك"
+  },
+  "filters": {
+    "title": "المرشحات والبحث",
+    "clearAll": "مسح الكل",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن المهام...",
+    "priority": "الأولوية",
+    "allPriorities": "جميع الأولويات",
+    "highPriority": "أولوية عالية",
+    "mediumPriority": "أولوية متوسطة",
+    "lowPriority": "أولوية منخفضة",
+    "status": "الحالة",
+    "allTasks": "جميع المهام",
+    "activeOnly": "النشطة فقط",
+    "completedOnly": "المكتملة فقط",
+    "tags": "الوسوم",
+    "tagsPlaceholder": "عمل، عاجل (مفصولة بفواصل)",
+    "sortBy": "الترتيب حسب",
+    "dateCreated": "تاريخ الإنشاء",
+    "dateUpdated": "تاريخ التحديث",
+    "titleAZ": "العنوان (أ-ي)",
+    "order": "الترتيب",
+    "descending": "تنازلي",
+    "ascending": "تصاعدي"
+  },
+  "taskForm": {
+    "editTask": "تعديل المهمة",
+    "createTask": "إنشاء مهمة جديدة",
+    "title": "العنوان",
+    "titlePlaceholder": "أدخل عنوان المهمة...",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل وصف المهمة...",
+    "priority": "الأولوية",
+    "lowPriority": "أولوية منخفضة",
+    "mediumPriority": "أولوية متوسطة",
+    "highPriority": "أولوية عالية",
+    "tags": "الوسوم",
+    "tagsPlaceholder": "أضف وسوم (اضغط Enter)...",
+    "addTag": "إضافة",
+    "saving": "جاري الحفظ...",
+    "updateTask": "تحديث المهمة",
+    "createTaskButton": "إنشاء المهمة",
+    "cancel": "إلغاء",
+    "titleRequired": "يرجى إدخال عنوان المهمة",
+    "saveFailed": "فشل حفظ المهمة. يرجى المحاولة مرة أخرى."
+  },
+  "taskList": {
+    "noTasks": "لم يتم العثور على أي مهام",
+    "noTasksDesc": "ابدأ بإنشاء مهمة جديدة أعلاه!"
+  },
+  "taskItem": {
+    "high": "أولوية عالية",
+    "medium": "متوسطة",
+    "low": "منخفضة",
+    "created": "تم الإنشاء:",
+    "updated": "تم التحديث:",
     "edit": "تعديل",
     "delete": "حذف",
-    "save": "حفظ",
-    "cancel": "إلغاء",
-    "search": "البحث عن المهام...",
-    "filter": "تصفية",
-    "sort": "ترتيب",
-    "clear": "مسح",
-    "close": "إغلاق"
+    "deleting": "جاري الحذف...",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذه المهمة؟",
+    "updateFailed": "فشل تحديث المهمة",
+    "deleteFailed": "فشل حذف المهمة"
   },
-  "task": {
-    "title": "العنوان",
-    "description": "الوصف",
-    "completed": "مكتملة",
-    "pending": "قيد الانتظار",
-    "created": "تم الإنشاء",
-    "updated": "تم التحديث",
-    "noTasks": "لم يتم العثور على مهام",
-    "addPlaceholder": "أدخل عنوان المهمة...",
-    "descriptionPlaceholder": "أدخل الوصف (اختياري)..."
+  "landing": {
+    "hero": {
+      "title1": "إنتاجية سهلة،",
+      "title2": "تصميم جميل",
+      "subtitle": "اختبر مستقبل إدارة المهام",
+      "cta": "ابدأ رحلتك المجانية ←"
+    },
+    "nav": {
+      "signin": "تسجيل الدخول",
+      "getStarted": "ابدأ مجانًا"
+    },
+    "footer": {
+      "subtitle": "إنتاجية سهلة، تصميم جميل",
+      "poweredBy": "مدعوم بواسطة",
+      "author": "سيدة علشبا فاطمة",
+      "copyright": "© 2025 فلو تاسك. جميع الحقوق محفوظة."
+    }
   },
-  "priority": {
-    "label": "الأولوية",
-    "high": "عالية",
-    "medium": "متوسطة",
-    "low": "منخفضة"
-  },
-  "tags": {
-    "label": "الوسوم",
-    "placeholder": "إضافة وسوم...",
-    "addTag": "إضافة وسم"
-  },
-  "filter": {
-    "all": "جميع المهام",
-    "completed": "المكتملة",
-    "pending": "قيد الانتظار",
-    "byPriority": "حسب الأولوية",
-    "byTags": "حسب الوسوم"
-  },
-  "sort": {
-    "label": "ترتيب حسب",
-    "createdAt": "تاريخ الإنشاء",
-    "updatedAt": "تاريخ التحديث",
-    "priority": "الأولوية",
-    "title": "العنوان",
-    "asc": "تصاعدي",
-    "desc": "تنازلي"
-  },
-  "voice": {
-    "button": "أمر صوتي",
-    "listening": "جاري الاستماع...",
-    "notSupported": "التعرف على الصوت غير مدعوم في هذا المتصفح",
-    "permissionDenied": "تم رفض إذن الميكروفون",
-    "error": "خطأ في التعرف على الصوت"
-  },
-  "chat": {
-    "title": "المساعد الذكي",
-    "placeholder": "اسألني أي شيء عن مهامك...",
-    "send": "إرسال",
-    "clear": "مسح السجل",
-    "thinking": "جاري التفكير...",
-    "error": "فشل في الحصول على رد"
-  },
-  "language": {
-    "label": "اللغة",
-    "en": "الإنجليزية (English)",
-    "ur": "الأردية (اردو)",
-    "ar": "العربية",
-    "es": "الإسبانية (Español)",
-    "fr": "الفرنسية (Français)",
-    "de": "الألمانية (Deutsch)"
-  },
-  "messages": {
-    "taskCreated": "تم إنشاء المهمة بنجاح",
-    "taskUpdated": "تم تحديث المهمة بنجاح",
-    "taskDeleted": "تم حذف المهمة بنجاح",
-    "error": "حدث خطأ",
-    "loading": "جاري التحميل...",
-    "confirmDelete": "هل أنت متأكد من حذف هذه المهمة؟"
-  },
-  "validation": {
-    "titleRequired": "العنوان مطلوب",
-    "titleTooLong": "العنوان طويل جداً (الحد الأقصى 200 حرف)",
-    "descriptionTooLong": "الوصف طويل جداً (الحد الأقصى 2000 حرف)"
+  "auth": {
+    "signin": {
+      "title": "تسجيل الدخول إلى حسابك",
+      "email": "عنوان البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "button": "تسجيل الدخول",
+      "loading": "جاري تسجيل الدخول...",
+      "github": "المتابعة مع GitHub",
+      "noAccount": "ليس لديك حساب؟",
+      "signupLink": "اشترك مجانًا",
+      "divider": "أو تابع مع"
+    },
+    "footer": {
+      "poweredBy": "مدعوم بواسطة",
+      "author": "سيدة علشبا فاطمة"
+    }
   }
 }
