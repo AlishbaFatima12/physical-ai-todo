@@ -3,6 +3,7 @@
 import { Task, Priority } from '@/lib/types'
 import { toggleComplete, deleteTask } from '@/lib/api'
 import { useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface TaskItemProps {
   task: Task
@@ -16,15 +17,16 @@ const priorityColors: Record<Priority, string> = {
   low: 'bg-blue-100 text-blue-800 border-blue-300',
 }
 
-const priorityLabels: Record<Priority, string> = {
-  high: 'High Priority',
-  medium: 'Medium',
-  low: 'Low',
-}
-
 export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
+  const { t } = useI18n()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isToggling, setIsToggling] = useState(false)
+
+  const priorityLabels: Record<Priority, string> = {
+    high: t('taskItem.high'),
+    medium: t('taskItem.medium'),
+    low: t('taskItem.low'),
+  }
 
   const handleToggle = async () => {
     if (isToggling) return
@@ -34,7 +36,7 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
       onUpdate()
     } catch (error) {
       console.error('Failed to toggle task:', error)
-      alert('Failed to update task')
+      alert(t('taskItem.updateFailed'))
     } finally {
       setIsToggling(false)
     }
@@ -42,7 +44,7 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
 
   const handleDelete = async () => {
     if (isDeleting) return
-    if (!confirm('Are you sure you want to delete this task?')) return
+    if (!confirm(t('taskItem.deleteConfirm'))) return
 
     setIsDeleting(true)
     try {
@@ -50,7 +52,7 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
       onUpdate()
     } catch (error) {
       console.error('Failed to delete task:', error)
-      alert('Failed to delete task')
+      alert(t('taskItem.deleteFailed'))
     } finally {
       setIsDeleting(false)
     }
@@ -138,12 +140,12 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
 
           {/* Dates */}
           <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-2">
-            <span title="Created">
-              Created: {formatDate(task.created_at)}
+            <span title={t('taskItem.created')}>
+              {t('taskItem.created')}: {formatDate(task.created_at)}
             </span>
             {task.updated_at !== task.created_at && (
-              <span title="Last Updated">
-                Updated: {formatDate(task.updated_at)}
+              <span title={t('taskItem.updated')}>
+                {t('taskItem.updated')}: {formatDate(task.updated_at)}
               </span>
             )}
           </div>
@@ -154,14 +156,14 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
               onClick={() => onEdit(task)}
               className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              Edit
+              {t('taskItem.edit')}
             </button>
             <button
               onClick={handleDelete}
               disabled={isDeleting}
               className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50"
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? t('taskItem.deleting') : t('taskItem.delete')}
             </button>
           </div>
         </div>
