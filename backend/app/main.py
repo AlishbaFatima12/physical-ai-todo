@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
-from app.routes import tasks
+from app.routes import tasks, chat
 from app.auth import routes as auth
 from app.api import subtasks, notes, attachments
 from app.database import init_db
@@ -48,6 +48,7 @@ app.include_router(tasks.router)  # Task routes (protected)
 app.include_router(subtasks.router)  # Subtask routes (protected)
 app.include_router(notes.router)  # Note routes (protected)
 app.include_router(attachments.router)  # Attachment routes (protected)
+app.include_router(chat.router, prefix="/api/v1")  # Chat routes (protected) - Phase III
 
 # Health check endpoint
 @app.get("/health")
