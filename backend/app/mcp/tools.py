@@ -80,6 +80,9 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
         Dict with success status and list of tasks
     """
     try:
+        # DEBUG: Log the user_id being used
+        print(f"🔍 DEBUG list_tasks_tool called with user_id: {params.user_id}")
+
         # Determine completed filter based on status
         completed_filter = None
         if params.status == "pending":
@@ -95,6 +98,9 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
             completed=completed_filter,
             priority=params.priority
         )
+
+        # DEBUG: Log how many tasks were returned
+        print(f"🔍 DEBUG list_tasks returned {len(tasks)} tasks for user_id {params.user_id}")
 
         # Format tasks for response
         task_list = []
@@ -128,22 +134,66 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
 def complete_task_tool(params: CompleteTaskSchema, session: Session) -> Dict[str, Any]:
     """
     MCP Tool: Mark a task as complete.
+    Accepts either task_id OR task_title for flexible completion.
 
     Args:
-        params: CompleteTaskSchema with user_id, task_id
+        params: CompleteTaskSchema with user_id and either task_id or task_title
         session: Database session
 
     Returns:
         Dict with success status and updated task details
     """
     try:
-        # Verify task exists and belongs to user
-        task = get_task(params.task_id, session)
+        task = None
+        task_id_to_complete = None
+
+        # If task_title is provided, find the task by title
+        if params.task_title:
+            tasks, _ = list_tasks(
+                session=session,
+                user_id=params.user_id,
+                limit=100,
+                search=params.task_title,
+                completed=False  # Only search pending tasks
+            )
+
+            matching_tasks = [t for t in tasks if t.title.lower() == params.task_title.lower()]
+            if not matching_tasks:
+                matching_tasks = [t for t in tasks if params.task_title.lower() in t.title.lower()]
+
+            if not matching_tasks:
+                return {
+                    "success": False,
+                    "error": "Task not found",
+                    "message": f"No pending task found with title matching '{params.task_title}'"
+                }
+
+            if len(matching_tasks) > 1:
+                task_list = "\n".join([f"- ID {t.id}: {t.title}" for t in matching_tasks])
+                return {
+                    "success": False,
+                    "error": "Multiple matches",
+                    "message": f"Found multiple tasks matching '{params.task_title}':\n{task_list}\n\nPlease use the task ID."
+                }
+
+            task = matching_tasks[0]
+            task_id_to_complete = task.id
+
+        elif params.task_id:
+            task = get_task(params.task_id, session)
+            task_id_to_complete = params.task_id
+        else:
+            return {
+                "success": False,
+                "error": "Missing parameter",
+                "message": "Please provide either task_id or task_title"
+            }
+
         if not task:
             return {
                 "success": False,
                 "error": "Task not found",
-                "message": f"Task with ID {params.task_id} not found"
+                "message": f"Task with ID {task_id_to_complete} not found"
             }
 
         if task.user_id != params.user_id:
@@ -155,14 +205,14 @@ def complete_task_tool(params: CompleteTaskSchema, session: Session) -> Dict[str
 
         # Mark as complete
         task_patch = TaskPatch(completed=True)
-        updated_task = patch_task(params.task_id, task_patch, session)
+        updated_task = patch_task(task_id_to_complete, task_patch, session)
 
         return {
             "success": True,
             "task_id": updated_task.id,
             "title": updated_task.title,
             "completed": updated_task.completed,
-            "message": f"Task '{updated_task.title}' marked as complete"
+            "message": f"✅ Task '{updated_task.title}' marked as complete!"
         }
     except Exception as e:
         return {
@@ -175,24 +225,75 @@ def complete_task_tool(params: CompleteTaskSchema, session: Session) -> Dict[str
 def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, Any]:
     """
     MCP Tool: Delete a task from the user's todo list.
+    Accepts either task_id OR task_title for flexible deletion.
 
     Args:
-        params: DeleteTaskSchema with user_id, task_id
+        params: DeleteTaskSchema with user_id and either task_id or task_title
         session: Database session
 
     Returns:
         Dict with success status
     """
     try:
-        # Verify task exists and belongs to user
-        task = get_task(params.task_id, session)
+        task = None
+        task_id_to_delete = None
+
+        # If task_title is provided, find the task by title
+        if params.task_title:
+            # Get user's tasks and search by title
+            tasks, _ = list_tasks(
+                session=session,
+                user_id=params.user_id,
+                limit=100,
+                search=params.task_title
+            )
+
+            # Find exact match (case-insensitive)
+            matching_tasks = [t for t in tasks if t.title.lower() == params.task_title.lower()]
+
+            if not matching_tasks:
+                # Try partial match
+                matching_tasks = [t for t in tasks if params.task_title.lower() in t.title.lower()]
+
+            if not matching_tasks:
+                return {
+                    "success": False,
+                    "error": "Task not found",
+                    "message": f"No task found with title matching '{params.task_title}'"
+                }
+
+            if len(matching_tasks) > 1:
+                task_list = "\n".join([f"- ID {t.id}: {t.title}" for t in matching_tasks])
+                return {
+                    "success": False,
+                    "error": "Multiple matches",
+                    "message": f"Found multiple tasks matching '{params.task_title}':\n{task_list}\n\nPlease use the task ID to delete."
+                }
+
+            task = matching_tasks[0]
+            task_id_to_delete = task.id
+
+        # If task_id is provided, use it directly
+        elif params.task_id:
+            task = get_task(params.task_id, session)
+            task_id_to_delete = params.task_id
+
+        else:
+            return {
+                "success": False,
+                "error": "Missing parameter",
+                "message": "Please provide either task_id or task_title"
+            }
+
+        # Verify task exists
         if not task:
             return {
                 "success": False,
                 "error": "Task not found",
-                "message": f"Task with ID {params.task_id} not found"
+                "message": f"Task with ID {task_id_to_delete} not found"
             }
 
+        # Verify ownership
         if task.user_id != params.user_id:
             return {
                 "success": False,
@@ -204,13 +305,13 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
         task_title = task.title
 
         # Delete task
-        deleted = crud_delete_task(params.task_id, session)
+        deleted = crud_delete_task(task_id_to_delete, session)
 
         if deleted:
             return {
                 "success": True,
-                "task_id": params.task_id,
-                "message": f"Task '{task_title}' deleted successfully"
+                "task_id": task_id_to_delete,
+                "message": f"✅ Task '{task_title}' deleted successfully!"
             }
         else:
             return {
@@ -229,22 +330,65 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
 def update_task_tool(params: UpdateTaskSchema, session: Session) -> Dict[str, Any]:
     """
     MCP Tool: Update task details (title, description, priority).
+    Accepts either task_id OR task_title to identify the task.
 
     Args:
-        params: UpdateTaskSchema with user_id, task_id, and optional fields
+        params: UpdateTaskSchema with user_id, task identifier, and optional update fields
         session: Database session
 
     Returns:
         Dict with success status and updated task details
     """
     try:
-        # Verify task exists and belongs to user
-        task = get_task(params.task_id, session)
+        task = None
+        task_id_to_update = None
+
+        # If task_title is provided, find the task by title
+        if params.task_title:
+            tasks, _ = list_tasks(
+                session=session,
+                user_id=params.user_id,
+                limit=100,
+                search=params.task_title
+            )
+
+            matching_tasks = [t for t in tasks if t.title.lower() == params.task_title.lower()]
+            if not matching_tasks:
+                matching_tasks = [t for t in tasks if params.task_title.lower() in t.title.lower()]
+
+            if not matching_tasks:
+                return {
+                    "success": False,
+                    "error": "Task not found",
+                    "message": f"No task found with title matching '{params.task_title}'"
+                }
+
+            if len(matching_tasks) > 1:
+                task_list = "\n".join([f"- ID {t.id}: {t.title}" for t in matching_tasks])
+                return {
+                    "success": False,
+                    "error": "Multiple matches",
+                    "message": f"Found multiple tasks matching '{params.task_title}':\n{task_list}\n\nPlease use the task ID."
+                }
+
+            task = matching_tasks[0]
+            task_id_to_update = task.id
+
+        elif params.task_id:
+            task = get_task(params.task_id, session)
+            task_id_to_update = params.task_id
+        else:
+            return {
+                "success": False,
+                "error": "Missing parameter",
+                "message": "Please provide either task_id or task_title to identify the task"
+            }
+
         if not task:
             return {
                 "success": False,
                 "error": "Task not found",
-                "message": f"Task with ID {params.task_id} not found"
+                "message": f"Task with ID {task_id_to_update} not found"
             }
 
         if task.user_id != params.user_id:
@@ -272,7 +416,7 @@ def update_task_tool(params: UpdateTaskSchema, session: Session) -> Dict[str, An
 
         # Update task
         task_patch = TaskPatch(**update_data)
-        updated_task = patch_task(params.task_id, task_patch, session)
+        updated_task = patch_task(task_id_to_update, task_patch, session)
 
         return {
             "success": True,
@@ -325,43 +469,46 @@ TOOLS = {
     "complete_task": {
         "function": complete_task_tool,
         "schema": CompleteTaskSchema,
-        "description": "Mark a task as complete",
+        "description": "Mark a task as complete. Accepts either task_id (integer) OR task_title (string) to identify the task.",
         "parameters": {
             "type": "object",
             "properties": {
                 "user_id": {"type": "integer", "description": "ID of the user"},
-                "task_id": {"type": "integer", "description": "ID of the task to complete"}
+                "task_id": {"type": "integer", "description": "ID of the task to complete (optional if task_title provided)"},
+                "task_title": {"type": "string", "description": "Title/name of the task to complete (optional if task_id provided)"}
             },
-            "required": ["user_id", "task_id"]
+            "required": ["user_id"]
         }
     },
     "delete_task": {
         "function": delete_task_tool,
         "schema": DeleteTaskSchema,
-        "description": "Delete a task from the user's todo list",
+        "description": "Delete a task from the user's todo list. Accepts either task_id (integer) OR task_title (string) to identify the task.",
         "parameters": {
             "type": "object",
             "properties": {
                 "user_id": {"type": "integer", "description": "ID of the user"},
-                "task_id": {"type": "integer", "description": "ID of the task to delete"}
+                "task_id": {"type": "integer", "description": "ID of the task to delete (optional if task_title provided)"},
+                "task_title": {"type": "string", "description": "Title/name of the task to delete (optional if task_id provided)"}
             },
-            "required": ["user_id", "task_id"]
+            "required": ["user_id"]
         }
     },
     "update_task": {
         "function": update_task_tool,
         "schema": UpdateTaskSchema,
-        "description": "Update task details (title, description, priority)",
+        "description": "Update task details (title, description, priority). Accepts either task_id OR task_title to identify the task.",
         "parameters": {
             "type": "object",
             "properties": {
                 "user_id": {"type": "integer", "description": "ID of the user"},
-                "task_id": {"type": "integer", "description": "ID of the task to update"},
-                "title": {"type": "string", "description": "New task title"},
-                "description": {"type": "string", "description": "New task description"},
-                "priority": {"type": "string", "enum": ["low", "medium", "high"], "description": "New priority"}
+                "task_id": {"type": "integer", "description": "ID of the task to update (optional if task_title provided)"},
+                "task_title": {"type": "string", "description": "Current title/name of the task to update (optional if task_id provided)"},
+                "title": {"type": "string", "description": "New task title (optional)"},
+                "description": {"type": "string", "description": "New task description (optional)"},
+                "priority": {"type": "string", "enum": ["low", "medium", "high"], "description": "New priority (optional)"}
             },
-            "required": ["user_id", "task_id"]
+            "required": ["user_id"]
         }
     }
 }
