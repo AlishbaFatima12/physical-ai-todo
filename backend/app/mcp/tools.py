@@ -81,7 +81,7 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
     """
     try:
         # DEBUG: Log the user_id being used
-        print(f"🔍 DEBUG list_tasks_tool called with user_id: {params.user_id}")
+        print(f"DEBUG list_tasks_tool called with user_id: {params.user_id}")
 
         # Determine completed filter based on status
         completed_filter = None
@@ -100,7 +100,7 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
         )
 
         # DEBUG: Log how many tasks were returned
-        print(f"🔍 DEBUG list_tasks returned {len(tasks)} tasks for user_id {params.user_id}")
+        print(f"DEBUG list_tasks returned {len(tasks)} tasks for user_id {params.user_id}")
 
         # Format tasks for response
         task_list = []
