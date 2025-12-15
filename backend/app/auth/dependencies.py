@@ -1,5 +1,5 @@
 """Authentication dependencies for FastAPI"""
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status, Cookie, Header
 from sqlmodel import Session, select
 from typing import Optional
 
@@ -10,17 +10,25 @@ from app.auth.jwt import decode_access_token
 
 async def get_current_user(
     access_token: Optional[str] = Cookie(None),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
     session: Session = Depends(get_session)
 ) -> User:
-    """Get current authenticated user from JWT cookie"""
-    if not access_token:
+    """Get current authenticated user from JWT cookie or Authorization header"""
+    # Try to get token from Authorization header first (for API calls)
+    token = access_token
+    if not token and authorization:
+        # Extract token from "Bearer <token>" format
+        if authorization.startswith("Bearer "):
+            token = authorization.replace("Bearer ", "")
+
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    payload = decode_access_token(access_token)
+    payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
