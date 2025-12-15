@@ -48,12 +48,12 @@ description: "Task breakdown for Phase III AI-Powered Conversational Task Manage
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Create Alembic migration for conversation_messages table in backend/alembic/versions/[timestamp]_add_conversation_messages.py
-- [ ] T010 Run Alembic migration: `alembic upgrade head` and verify table exists in Neon PostgreSQL
-- [ ] T011 Create ConversationMessage SQLModel class in backend/app/models.py with fields: id, conversation_id, user_id, role, content, tool_calls, created_at
-- [ ] T012 Add indexes to conversation_messages table for conversation_id, user_id, created_at (in migration)
-- [ ] T013 Create conversation CRUD operations in backend/app/crud.py: create_message, get_conversation_history, get_user_conversations
-- [ ] T014 Test conversation persistence with pytest in backend/tests/test_conversation_persistence.py
+- [X] T009 Create Alembic migration for conversation_messages table in backend/alembic/versions/[timestamp]_add_conversation_messages.py
+- [X] T010 Run Alembic migration: `alembic upgrade head` and verify table exists in Neon PostgreSQL
+- [X] T011 Create ConversationMessage SQLModel class in backend/app/models.py with fields: id, conversation_id, user_id, role, content, tool_calls, created_at
+- [X] T012 Add indexes to conversation_messages table for conversation_id, user_id, created_at (in migration)
+- [X] T013 Create conversation CRUD operations in backend/app/crud.py: create_message, get_conversation_history, get_user_conversations
+- [X] T014 Test conversation persistence with pytest in backend/tests/test_conversation_persistence.py
 
 **Checkpoint**: Foundation ready - conversation database schema complete, all user story implementation can now begin
 
@@ -67,40 +67,40 @@ description: "Task breakdown for Phase III AI-Powered Conversational Task Manage
 
 ### MCP Tools Implementation (Backend)
 
-- [ ] T015 [P] [US1] Create MCP tool schema for add_task in backend/app/mcp/schemas.py with parameters: user_id, title, description
-- [ ] T016 [P] [US1] Create MCP tool schema for list_tasks in backend/app/mcp/schemas.py with parameters: user_id, status (all/pending/completed)
-- [ ] T017 [P] [US1] Create MCP tool schema for complete_task in backend/app/mcp/schemas.py with parameters: user_id, task_id
-- [ ] T018 [P] [US1] Create MCP tool schema for delete_task in backend/app/mcp/schemas.py with parameters: user_id, task_id
-- [ ] T019 [P] [US1] Create MCP tool schema for update_task in backend/app/mcp/schemas.py with parameters: user_id, task_id, title, description
-- [ ] T020 [US1] Implement add_task MCP tool function in backend/app/mcp/tools.py calling crud.create_task
-- [ ] T021 [US1] Implement list_tasks MCP tool function in backend/app/mcp/tools.py calling crud.get_tasks with filters
-- [ ] T022 [US1] Implement complete_task MCP tool function in backend/app/mcp/tools.py calling crud.update_task(is_completed=True)
-- [ ] T023 [US1] Implement delete_task MCP tool function in backend/app/mcp/tools.py calling crud.delete_task
-- [ ] T024 [US1] Implement update_task MCP tool function in backend/app/mcp/tools.py calling crud.update_task
-- [ ] T025 [US1] Initialize MCP server in backend/app/mcp/server.py and register all 5 tools
+- [X] T015 [P] [US1] Create MCP tool schema for add_task in backend/app/mcp/schemas.py with parameters: user_id, title, description
+- [X] T016 [P] [US1] Create MCP tool schema for list_tasks in backend/app/mcp/schemas.py with parameters: user_id, status (all/pending/completed)
+- [X] T017 [P] [US1] Create MCP tool schema for complete_task in backend/app/mcp/schemas.py with parameters: user_id, task_id
+- [X] T018 [P] [US1] Create MCP tool schema for delete_task in backend/app/mcp/schemas.py with parameters: user_id, task_id
+- [X] T019 [P] [US1] Create MCP tool schema for update_task in backend/app/mcp/schemas.py with parameters: user_id, task_id, title, description
+- [X] T020 [US1] Implement add_task MCP tool function in backend/app/mcp/tools.py calling crud.create_task
+- [X] T021 [US1] Implement list_tasks MCP tool function in backend/app/mcp/tools.py calling crud.get_tasks with filters
+- [X] T022 [US1] Implement complete_task MCP tool function in backend/app/mcp/tools.py calling crud.update_task(is_completed=True)
+- [X] T023 [US1] Implement delete_task MCP tool function in backend/app/mcp/tools.py calling crud.delete_task
+- [X] T024 [US1] Implement update_task MCP tool function in backend/app/mcp/tools.py calling crud.update_task
+- [X] T025 [US1] Initialize MCP server in backend/app/mcp/server.py and register all 5 tools
 
 ### AI Agent Integration
 
-- [ ] T026 [US1] Create system prompt for task management assistant in backend/app/chat/prompts.py defining personality and capabilities
-- [ ] T027 [US1] Implement OpenAI agent initialization in backend/app/chat/agent.py with GPT-4 Turbo model and function calling
-- [ ] T028 [US1] Implement tool execution handler in backend/app/chat/agent.py mapping OpenAI function calls to MCP tools
-- [ ] T029 [US1] Implement conversation context builder in backend/app/chat/conversation.py fetching last 20 messages from database
+- [X] T026 [US1] Create system prompt for task management assistant in backend/app/chat/prompts.py defining personality and capabilities
+- [X] T027 [US1] Implement OpenAI agent initialization in backend/app/chat/agent.py with GPT-4 Turbo model and function calling
+- [X] T028 [US1] Implement tool execution handler in backend/app/chat/agent.py mapping OpenAI function calls to MCP tools
+- [X] T029 [US1] Implement conversation context builder in backend/app/chat/conversation.py fetching last 20 messages from database
 
 ### Chat Endpoint
 
-- [ ] T030 [US1] Create POST /api/v1/chat endpoint in backend/app/routes/chat.py accepting conversation_id (optional) and message
-- [ ] T031 [US1] Implement stateless conversation handling: fetch history, save user message, execute AI agent, save assistant response
-- [ ] T032 [US1] Add JWT authentication to chat endpoint using existing auth middleware from Phase II
-- [ ] T033 [US1] Register chat router in backend/app/main.py with /api/v1 prefix
-- [ ] T034 [US1] Add request validation and error handling for chat endpoint (400, 401, 429, 500 responses)
+- [X] T030 [US1] Create POST /api/v1/chat endpoint in backend/app/routes/chat.py accepting conversation_id (optional) and message
+- [X] T031 [US1] Implement stateless conversation handling: fetch history, save user message, execute AI agent, save assistant response
+- [X] T032 [US1] Add JWT authentication to chat endpoint using existing auth middleware from Phase II
+- [X] T033 [US1] Register chat router in backend/app/main.py with /api/v1 prefix
+- [X] T034 [US1] Add request validation and error handling for chat endpoint (400, 401, 429, 500 responses)
 
 ### Backend Tests
 
-- [ ] T035 [P] [US1] Test add_task MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T036 [P] [US1] Test list_tasks MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T037 [P] [US1] Test complete_task MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T038 [P] [US1] Test delete_task MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T039 [P] [US1] Test update_task MCP tool in backend/tests/test_mcp_tools.py
+- [X] T035 [P] [US1] Test add_task MCP tool in backend/tests/test_mcp_tools.py
+- [X] T036 [P] [US1] Test list_tasks MCP tool in backend/tests/test_mcp_tools.py
+- [X] T037 [P] [US1] Test complete_task MCP tool in backend/tests/test_mcp_tools.py
+- [X] T038 [P] [US1] Test delete_task MCP tool in backend/tests/test_mcp_tools.py
+- [X] T039 [P] [US1] Test update_task MCP tool in backend/tests/test_mcp_tools.py
 - [ ] T040 [US1] Test POST /api/v1/chat endpoint for task creation flow in backend/tests/test_chat_api.py
 - [ ] T041 [US1] Test chat endpoint authentication (401 unauthorized) in backend/tests/test_chat_api.py
 - [ ] T042 [US1] Test chat endpoint tool execution and response format in backend/tests/test_chat_api.py
