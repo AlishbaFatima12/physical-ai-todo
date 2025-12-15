@@ -1,6 +1,6 @@
 """SQLModel database models for Physical AI Todo"""
 from sqlmodel import SQLModel, Field, Relationship, Column
-from sqlalchemy import JSON
+from sqlalchemy import JSON, BigInteger
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -155,7 +155,7 @@ class ConversationMessage(SQLModel, table=True):
     __tablename__ = "conversation_messages"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    conversation_id: int = Field(index=True)
+    conversation_id: int = Field(sa_column=Column(BigInteger, index=True))
     user_id: int = Field(foreign_key="user.id", index=True)
     role: str = Field(max_length=20)  # user, assistant, system
     content: str

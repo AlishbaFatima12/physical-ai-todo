@@ -29,12 +29,15 @@ export default function Home() {
     queryKey: ['tasks', search, priority, completed, tags, sortField, sortOrder],
     queryFn: () => getTasks({
       search: search || undefined,
-      priority: priority || undefined,
+      priority: (priority || undefined) as any,
       completed: completed === 'all' ? undefined : completed === 'true',
       tags: tags || undefined,
-      sort: sortField,
-      order: sortOrder,
+      sort: sortField as any,
+      order: sortOrder as any,
     }),
+    refetchOnMount: 'always',        // Always refetch when component mounts
+    refetchOnWindowFocus: true,      // Refetch when browser tab/window gains focus
+    staleTime: 0,                    // Consider data immediately stale
   })
 
   const tasks = data?.tasks || []
