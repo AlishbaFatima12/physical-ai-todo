@@ -18,7 +18,7 @@ pandas==2.1.4
 # PyPDF2==3.0.1  # PDF - optional for now
 
 # Email
-python-emails==0.6
+emails==0.6
 resend==0.8.0
 
 # Authentication
