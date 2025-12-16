@@ -81,7 +81,7 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
     """
     try:
         # DEBUG: Log the user_id being used
-        print(f"🔍 DEBUG list_tasks_tool called with user_id: {params.user_id}")
+        print(f"DEBUG list_tasks_tool called with user_id: {params.user_id}")
 
         # Determine completed filter based on status
         completed_filter = None
@@ -100,7 +100,7 @@ def list_tasks_tool(params: ListTasksSchema, session: Session) -> Dict[str, Any]
         )
 
         # DEBUG: Log how many tasks were returned
-        print(f"🔍 DEBUG list_tasks returned {len(tasks)} tasks for user_id {params.user_id}")
+        print(f"DEBUG list_tasks returned {len(tasks)} tasks for user_id {params.user_id}")
 
         # Format tasks for response
         task_list = []
@@ -235,11 +235,14 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
         Dict with success status
     """
     try:
+        print(f"DELETE TOOL DEBUG: Called with user_id={params.user_id}, task_id={params.task_id}, task_title={params.task_title}")
+
         task = None
         task_id_to_delete = None
 
         # If task_title is provided, find the task by title
         if params.task_title:
+            print(f"DELETE TOOL DEBUG: Searching for task by title: '{params.task_title}'")
             # Get user's tasks and search by title
             tasks, _ = list_tasks(
                 session=session,
@@ -272,11 +275,15 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
 
             task = matching_tasks[0]
             task_id_to_delete = task.id
+            print(f"DELETE TOOL DEBUG: Found task by title: ID={task.id}, title={task.title}, owner_user_id={task.user_id}")
 
         # If task_id is provided, use it directly
         elif params.task_id:
+            print(f"DELETE TOOL DEBUG: Searching for task by ID: {params.task_id}")
             task = get_task(params.task_id, session)
             task_id_to_delete = params.task_id
+            if task:
+                print(f"DELETE TOOL DEBUG: Found task by ID: ID={task.id}, title={task.title}, owner_user_id={task.user_id}")
 
         else:
             return {
@@ -287,6 +294,7 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
 
         # Verify task exists
         if not task:
+            print(f"DELETE TOOL DEBUG: Task not found!")
             return {
                 "success": False,
                 "error": "Task not found",
@@ -294,7 +302,9 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
             }
 
         # Verify ownership
+        print(f"DELETE TOOL DEBUG: Checking ownership - task.user_id={task.user_id} vs params.user_id={params.user_id}")
         if task.user_id != params.user_id:
+            print(f"DELETE TOOL DEBUG: PERMISSION DENIED! Task belongs to user {task.user_id}, but request is from user {params.user_id}")
             return {
                 "success": False,
                 "error": "Permission denied",
@@ -443,12 +453,12 @@ TOOLS = {
         "parameters": {
             "type": "object",
             "properties": {
-                "user_id": {"type": "integer", "description": "ID of the user"},
+                "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "title": {"type": "string", "description": "Task title"},
                 "description": {"type": "string", "description": "Task description"},
                 "priority": {"type": "string", "enum": ["low", "medium", "high"], "description": "Priority level"}
             },
-            "required": ["user_id", "title"]
+            "required": ["title"]
         }
     },
     "list_tasks": {
@@ -458,26 +468,26 @@ TOOLS = {
         "parameters": {
             "type": "object",
             "properties": {
-                "user_id": {"type": "integer", "description": "ID of the user"},
+                "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "status": {"type": "string", "enum": ["all", "pending", "completed"], "description": "Filter by status"},
                 "priority": {"type": "string", "enum": ["low", "medium", "high"], "description": "Filter by priority"},
                 "limit": {"type": "integer", "description": "Maximum number of tasks"}
             },
-            "required": ["user_id"]
+            "required": []
         }
     },
     "complete_task": {
         "function": complete_task_tool,
         "schema": CompleteTaskSchema,
-        "description": "Mark a task as complete. Accepts either task_id (integer) OR task_title (string) to identify the task.",
+        "description": "REQUIRED TOOL: Mark a task as complete in the database. You MUST call this tool when user says 'complete [task]' or 'mark [task] as done'. Accepts either task_id (integer) OR task_title (string). NEVER say a task is completed without calling this tool - only the tool updates the database!",
         "parameters": {
             "type": "object",
             "properties": {
-                "user_id": {"type": "integer", "description": "ID of the user"},
+                "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "task_id": {"type": "integer", "description": "ID of the task to complete (optional if task_title provided)"},
-                "task_title": {"type": "string", "description": "Title/name of the task to complete (optional if task_id provided)"}
+                "task_title": {"type": "string", "description": "Title/name of the task to complete (PREFERRED - use this when user provides task name)"}
             },
-            "required": ["user_id"]
+            "required": []
         }
     },
     "delete_task": {
@@ -487,11 +497,11 @@ TOOLS = {
         "parameters": {
             "type": "object",
             "properties": {
-                "user_id": {"type": "integer", "description": "ID of the user"},
+                "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "task_id": {"type": "integer", "description": "ID of the task to delete (optional if task_title provided)"},
                 "task_title": {"type": "string", "description": "Title/name of the task to delete (optional if task_id provided)"}
             },
-            "required": ["user_id"]
+            "required": []
         }
     },
     "update_task": {
@@ -501,14 +511,14 @@ TOOLS = {
         "parameters": {
             "type": "object",
             "properties": {
-                "user_id": {"type": "integer", "description": "ID of the user"},
+                "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "task_id": {"type": "integer", "description": "ID of the task to update (optional if task_title provided)"},
                 "task_title": {"type": "string", "description": "Current title/name of the task to update (optional if task_id provided)"},
                 "title": {"type": "string", "description": "New task title (optional)"},
                 "description": {"type": "string", "description": "New task description (optional)"},
                 "priority": {"type": "string", "enum": ["low", "medium", "high"], "description": "New priority (optional)"}
             },
-            "required": ["user_id"]
+            "required": []
         }
     }
 }

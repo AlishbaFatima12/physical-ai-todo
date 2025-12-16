@@ -13,6 +13,15 @@ class TaskBase(BaseModel):
     priority: Priority = Priority.MEDIUM
     tags: Optional[List[str]] = []
 
+    # Phase V: Due Dates & Reminders
+    due_date: Optional[datetime] = None
+    reminder_time: Optional[datetime] = None
+
+    # Phase V: Recurring Tasks
+    is_recurring: bool = False
+    recurrence_pattern: Optional[str] = Field(None, max_length=50)  # daily, weekly, monthly
+    recurrence_end_date: Optional[datetime] = None
+
 
 class TaskCreate(TaskBase):
     """Schema for creating a task"""
@@ -28,6 +37,15 @@ class TaskUpdate(BaseModel):
     tags: Optional[List[str]] = None
     display_order: Optional[int] = None
 
+    # Phase V: Due Dates & Reminders
+    due_date: Optional[datetime] = None
+    reminder_time: Optional[datetime] = None
+
+    # Phase V: Recurring Tasks
+    is_recurring: Optional[bool] = None
+    recurrence_pattern: Optional[str] = None
+    recurrence_end_date: Optional[datetime] = None
+
 
 class TaskPatch(BaseModel):
     """Schema for partially updating a task (PATCH)"""
@@ -37,6 +55,15 @@ class TaskPatch(BaseModel):
     priority: Optional[Priority] = None
     tags: Optional[List[str]] = None
     display_order: Optional[int] = None
+
+    # Phase V: Due Dates & Reminders
+    due_date: Optional[datetime] = None
+    reminder_time: Optional[datetime] = None
+
+    # Phase V: Recurring Tasks
+    is_recurring: Optional[bool] = None
+    recurrence_pattern: Optional[str] = None
+    recurrence_end_date: Optional[datetime] = None
 
 
 class SubtaskResponse(BaseModel):

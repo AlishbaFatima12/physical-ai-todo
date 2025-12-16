@@ -18,7 +18,7 @@ pandas==2.1.4
 # PyPDF2==3.0.1  # PDF - optional for now
 
 # Email
-python-emails==0.6
+emails==0.6
 resend==0.8.0
 
 # Authentication
@@ -38,3 +38,4 @@ httpx==0.25.2
 
 mcp>=1.24.0
 openai>=2.8.0
+google-generativeai>=0.3.0  # Phase V: Support for Google Gemini AI

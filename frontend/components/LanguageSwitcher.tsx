@@ -56,7 +56,7 @@ export default function LanguageSwitcher() {
               {languages.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => handleLanguageChange(lang.code)}
+                  onClick={() => handleLanguageChange(lang.code as any)}
                   className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors ${
                     lang.code === locale ? 'bg-blue-100' : ''
                   }`}

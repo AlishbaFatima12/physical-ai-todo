@@ -189,15 +189,15 @@ class ChatAgent:
                         tool_arguments = json.loads(tool_call.function.arguments)
 
                         # DEBUG: Log before injection
-                        print(f"🔍 DEBUG Agent: Tool {tool_name} called with args: {tool_arguments}")
-                        print(f"🔍 DEBUG Agent: Current user_id for this chat: {user_id}")
+                        print(f"DEBUG Agent: Tool {tool_name} called with args: {tool_arguments}")
+                        print(f"DEBUG Agent: Current user_id for this chat: {user_id}")
 
                         # Inject user_id if not provided
                         if "user_id" not in tool_arguments:
                             tool_arguments["user_id"] = user_id
-                            print(f"🔍 DEBUG Agent: Injected user_id {user_id} into tool_arguments")
+                            print(f"DEBUG Agent: Injected user_id {user_id} into tool_arguments")
                         else:
-                            print(f"🔍 DEBUG Agent: Tool already has user_id: {tool_arguments['user_id']}")
+                            print(f"DEBUG Agent: Tool already has user_id: {tool_arguments['user_id']}")
 
                         # Execute tool
                         tool_result = self._execute_tool(tool_name, tool_arguments, session)
