@@ -1,7 +1,8 @@
 # ===================================
 # Stage 1: Base Python Image
 # ===================================
-FROM python:3.13-slim AS base
+# Using Python 3.12 instead of 3.13 (pandas not yet compatible with 3.13)
+FROM python:3.12-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -35,7 +36,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM base AS production
 
 # Copy installed dependencies from dependencies stage
-COPY --from=dependencies /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=dependencies /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy application code
