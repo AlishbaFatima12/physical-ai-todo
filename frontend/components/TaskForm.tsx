@@ -23,7 +23,7 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
   useEffect(() => {
     if (editingTask) {
       setTitle(editingTask.title)
-      setDescription(editingTask.description)
+      setDescription(editingTask.description || '')
       setPriority(editingTask.priority)
       setTags(editingTask.tags || [])
     }

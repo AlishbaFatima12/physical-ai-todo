@@ -47,6 +47,16 @@ class Task(SQLModel, table=True):
     completed: bool = Field(default=False, index=True)
     priority: Priority = Field(default=Priority.MEDIUM, index=True)
     tags: Optional[str] = Field(default=None, max_length=1000)  # Comma-separated tags
+
+    # Phase V: Due Dates & Reminders
+    due_date: Optional[datetime] = Field(default=None, index=True)
+    reminder_time: Optional[datetime] = Field(default=None, index=True)
+
+    # Phase V: Recurring Tasks
+    is_recurring: bool = Field(default=False, index=True)
+    recurrence_pattern: Optional[str] = Field(default=None, max_length=50)  # daily, weekly, monthly, etc.
+    recurrence_end_date: Optional[datetime] = Field(default=None)
+
     display_order: int = Field(default=0, index=True)
     is_template: bool = Field(default=False, index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)

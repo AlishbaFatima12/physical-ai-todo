@@ -277,13 +277,18 @@ async def github_authorize():
     return RedirectResponse(github_auth_url)
 
 
+class GitHubCallbackRequest(BaseModel):
+    code: str
+
+
 @router.post("/github/callback")
 async def github_callback(
-    code: str,
+    request: GitHubCallbackRequest,
     response: Response,
     session: Session = Depends(get_session)
 ):
     """Handle GitHub OAuth callback and create/login user"""
+    code = request.code
     if not GITHUB_CLIENT_ID or not GITHUB_CLIENT_SECRET:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
