@@ -35,7 +35,7 @@ class User(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    tasks: List["Task"] = Relationship(back_populates="user", cascade_delete=True)
+    tasks: List["Task"] = Relationship(back_populates="user")
 
 
 class Task(SQLModel, table=True):
