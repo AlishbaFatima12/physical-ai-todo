@@ -23,7 +23,7 @@ def send_verification_email(to_email: str, verification_token: str, user_name: O
 
     try:
         resend.Emails.send({
-            "from": "FlowTask <onboarding@flowtask.dev>",
+            "from": "FlowTask <onboarding@resend.dev>",
             "to": to_email,
             "subject": "✓ Verify your FlowTask account",
             "html": f"""
@@ -89,7 +89,7 @@ def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
 
     try:
         resend.Emails.send({
-            "from": "FlowTask <hello@flowtask.dev>",
+            "from": "FlowTask <onboarding@resend.dev>",
             "to": to_email,
             "subject": "🎉 Welcome to FlowTask!",
             "html": f"""

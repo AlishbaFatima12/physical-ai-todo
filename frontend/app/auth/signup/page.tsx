@@ -300,7 +300,10 @@ export default function SignUpPage() {
           <div className="relative mb-4">
             <motion.button
               type="button"
-              onClick={() => window.location.href = 'http://localhost:8000/api/v1/auth/github/authorize'}
+              onClick={() => {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+                window.location.href = `${apiUrl}/auth/github/authorize`
+              }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg border border-gray-600 flex items-center justify-center gap-3 transition-all"

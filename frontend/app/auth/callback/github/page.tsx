@@ -35,7 +35,8 @@ export default function GitHubCallbackPage() {
 
   const handleCallback = async (code: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/github/callback', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+      const response = await fetch(`${apiUrl}/auth/github/callback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

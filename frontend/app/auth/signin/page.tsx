@@ -13,15 +13,15 @@ export default function SignInPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { user, isLoading: authLoading, login } = useAuth()
+  const { user, isLoading: authLoading, login, logout } = useAuth()
   const router = useRouter()
 
-  // Redirect to dashboard if already logged in
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.push('/dashboard')
-    }
-  }, [user, authLoading, router])
+  // Don't auto-redirect - let user choose to logout or go to dashboard
+  // useEffect(() => {
+  //   if (!authLoading && user) {
+  //     router.push('/dashboard')
+  //   }
+  // }, [user, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +37,10 @@ export default function SignInPage() {
     }
   }
 
+  const handleLogoutAndSignin = async () => {
+    await logout()
+  }
+
   // Show loading while checking auth status
   if (authLoading) {
     return (
@@ -48,6 +52,42 @@ export default function SignInPage() {
           </svg>
           <p>Loading...</p>
         </div>
+      </div>
+    )
+  }
+
+  // User is already logged in
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="backdrop-blur-xl bg-white bg-opacity-10 border border-white border-opacity-20 rounded-3xl p-8 shadow-2xl text-center">
+            <div className="text-6xl mb-4">✓</div>
+            <h2 className="text-2xl font-bold text-white mb-4">You're Already Signed In</h2>
+            <p className="text-gray-300 mb-2">Signed in as:</p>
+            <p className="text-white font-semibold mb-6">{user.email}</p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                Go to Dashboard
+              </button>
+
+              <button
+                onClick={handleLogoutAndSignin}
+                className="w-full py-3 bg-white bg-opacity-10 border border-white border-opacity-20 text-white font-medium rounded-lg hover:bg-opacity-20 transition-all"
+              >
+                Sign out and login with different account
+              </button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     )
   }
@@ -190,7 +230,10 @@ export default function SignInPage() {
           <div className="relative mb-6">
             <motion.button
               type="button"
-              onClick={() => window.location.href = 'http://localhost:8000/api/v1/auth/github/authorize'}
+              onClick={() => {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+                window.location.href = `${apiUrl}/auth/github/authorize`
+              }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg border border-gray-600 flex items-center justify-center gap-3 transition-all"

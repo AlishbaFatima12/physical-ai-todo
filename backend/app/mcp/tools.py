@@ -479,13 +479,13 @@ TOOLS = {
     "complete_task": {
         "function": complete_task_tool,
         "schema": CompleteTaskSchema,
-        "description": "Mark a task as complete. Accepts either task_id (integer) OR task_title (string) to identify the task.",
+        "description": "REQUIRED TOOL: Mark a task as complete in the database. You MUST call this tool when user says 'complete [task]' or 'mark [task] as done'. Accepts either task_id (integer) OR task_title (string). NEVER say a task is completed without calling this tool - only the tool updates the database!",
         "parameters": {
             "type": "object",
             "properties": {
                 "user_id": {"type": "integer", "description": "ID of the user (auto-injected)"},
                 "task_id": {"type": "integer", "description": "ID of the task to complete (optional if task_title provided)"},
-                "task_title": {"type": "string", "description": "Title/name of the task to complete (optional if task_id provided)"}
+                "task_title": {"type": "string", "description": "Title/name of the task to complete (PREFERRED - use this when user provides task name)"}
             },
             "required": []
         }
