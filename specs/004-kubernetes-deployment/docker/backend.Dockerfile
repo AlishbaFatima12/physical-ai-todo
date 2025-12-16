@@ -16,9 +16,12 @@ WORKDIR /app
 # ===================================
 FROM base AS dependencies
 
-# Install system dependencies
+# Install system dependencies and build tools
+# Need g++, build-essential for numpy/pandas compilation
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
+    build-essential \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
