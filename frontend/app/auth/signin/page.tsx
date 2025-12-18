@@ -16,12 +16,12 @@ export default function SignInPage() {
   const { user, isLoading: authLoading, login, logout } = useAuth()
   const router = useRouter()
 
-  // Don't auto-redirect - let user choose to logout or go to dashboard
-  // useEffect(() => {
-  //   if (!authLoading && user) {
-  //     router.push('/dashboard')
-  //   }
-  // }, [user, authLoading, router])
+  // Auto-redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/dashboard')
+    }
+  }, [user, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

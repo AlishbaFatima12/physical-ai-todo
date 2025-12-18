@@ -11,13 +11,20 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
 from app import crud
-from app.database import get_session
-from app.schemas import (
-    TaskCreate, TaskUpdate, TaskPatch, TaskRead, TaskListResponse,
-    BulkOperationRequest, BulkTagRequest, BulkPriorityRequest, ReorderRequest
-)
 from app.auth.dependencies import get_current_user
+from app.database import get_session
 from app.models import User
+from app.schemas import (
+    BulkOperationRequest,
+    BulkPriorityRequest,
+    BulkTagRequest,
+    ReorderRequest,
+    TaskCreate,
+    TaskListResponse,
+    TaskPatch,
+    TaskRead,
+    TaskUpdate,
+)
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
 
@@ -28,9 +35,15 @@ def get_tasks(
     offset: int = Query(0, ge=0, description="Number of tasks to skip"),
     search: Optional[str] = Query(None, description="Search in title/description"),
     completed: Optional[bool] = Query(None, description="Filter by completion status"),
-    priority: Optional[str] = Query(None, pattern="^(high|medium|low)$", description="Filter by priority"),
+    priority: Optional[str] = Query(
+        None, pattern="^(high|medium|low)$", description="Filter by priority"
+    ),
     tags: Optional[str] = Query(None, description="Comma-separated tags to filter by"),
-    sort: str = Query("created_at", pattern="^(created_at|updated_at|priority|title)$", description="Sort field"),
+    sort: str = Query(
+        "created_at",
+        pattern="^(created_at|updated_at|priority|title)$",
+        description="Sort field",
+    ),
     order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
@@ -75,13 +88,15 @@ def get_tasks(
             "description": task.description,
             "completed": task.completed,
             "priority": task.priority,
-            "tags": json.loads(task.tags) if task.tags else [],
+            "tags": db_task.tags if db_task.tags else [],
             "created_at": task.created_at,
             "updated_at": task.updated_at,
         }
         tasks_with_parsed_tags.append(TaskRead(**task_dict))
 
-    return TaskListResponse(tasks=tasks_with_parsed_tags, total=total, limit=limit, offset=offset)
+    return TaskListResponse(
+        tasks=tasks_with_parsed_tags, total=total, limit=limit, offset=offset
+    )
 
 
 @router.post("", response_model=TaskRead, status_code=201)
@@ -111,7 +126,7 @@ def create_task(
         description=db_task.description,
         completed=db_task.completed,
         priority=db_task.priority,
-        tags=json.loads(db_task.tags) if db_task.tags else [],
+        tags=db_task.tags if db_task.tags else [],
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
@@ -145,7 +160,7 @@ def get_task(
         description=db_task.description,
         completed=db_task.completed,
         priority=db_task.priority,
-        tags=json.loads(db_task.tags) if db_task.tags else [],
+        tags=db_task.tags if db_task.tags else [],
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
@@ -188,7 +203,7 @@ def update_task(
         description=db_task.description,
         completed=db_task.completed,
         priority=db_task.priority,
-        tags=json.loads(db_task.tags) if db_task.tags else [],
+        tags=db_task.tags if db_task.tags else [],
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
@@ -236,7 +251,7 @@ def patch_task(
         description=db_task.description,
         completed=db_task.completed,
         priority=db_task.priority,
-        tags=json.loads(db_task.tags) if db_task.tags else [],
+        tags=db_task.tags if db_task.tags else [],
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
@@ -305,7 +320,7 @@ def toggle_task_completion(
         description=db_task.description,
         completed=db_task.completed,
         priority=db_task.priority,
-        tags=json.loads(db_task.tags) if db_task.tags else [],
+        tags=db_task.tags if db_task.tags else [],
         created_at=db_task.created_at,
         updated_at=db_task.updated_at,
     )
@@ -314,6 +329,7 @@ def toggle_task_completion(
 # ============================================================================
 # Bulk Operations and Reorder Endpoints (US5: Interactive Management)
 # ============================================================================
+
 
 @router.post("/reorder")
 def reorder_tasks(
@@ -352,15 +368,15 @@ def reorder_tasks(
     for task_id in task_ids:
         task = crud.get_task(task_id, session)
         if not task or task.user_id != current_user.id:
-            raise HTTPException(status_code=403, detail=f"Task {task_id} not found or access denied")
+            raise HTTPException(
+                status_code=403, detail=f"Task {task_id} not found or access denied"
+            )
 
     # Update display_order for each task
     updated_count = 0
     for item in request.items:
         task = crud.patch_task(
-            item["id"],
-            TaskPatch(display_order=item["display_order"]),
-            session
+            item["id"], TaskPatch(display_order=item["display_order"]), session
         )
         if task:
             updated_count += 1
@@ -368,7 +384,7 @@ def reorder_tasks(
     return {
         "success": True,
         "updated_count": updated_count,
-        "message": f"Reordered {updated_count} tasks"
+        "message": f"Reordered {updated_count} tasks",
     }
 
 
@@ -409,7 +425,7 @@ def bulk_complete_tasks(
     return {
         "success": True,
         "updated_count": updated_count,
-        "message": f"Completed {updated_count} tasks"
+        "message": f"Completed {updated_count} tasks",
     }
 
 
@@ -449,7 +465,7 @@ def bulk_delete_tasks(
     return {
         "success": True,
         "deleted_count": deleted_count,
-        "message": f"Deleted {deleted_count} tasks"
+        "message": f"Deleted {deleted_count} tasks",
     }
 
 
@@ -497,7 +513,7 @@ def bulk_add_tag(
     return {
         "success": True,
         "updated_count": updated_count,
-        "message": f"Added tag '{request.tag}' to {updated_count} tasks"
+        "message": f"Added tag '{request.tag}' to {updated_count} tasks",
     }
 
 
@@ -538,5 +554,5 @@ def bulk_set_priority(
     return {
         "success": True,
         "updated_count": updated_count,
-        "message": f"Set priority to '{request.priority}' for {updated_count} tasks"
+        "message": f"Set priority to '{request.priority}' for {updated_count} tasks",
     }

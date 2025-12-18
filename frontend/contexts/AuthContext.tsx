@@ -2,6 +2,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+
 interface User {
   id: number
   email: string
@@ -33,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         credentials: 'include'
       })
 
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -83,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const register = async (email: string, password: string, fullName: string) => {
-    const response = await fetch('http://localhost:8000/api/v1/auth/register', {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -117,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:8000/api/v1/auth/logout', {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       })
