@@ -1,20 +1,24 @@
 """SQLModel database models for Physical AI Todo"""
-from sqlmodel import SQLModel, Field, Relationship, Column
-from sqlalchemy import JSON, BigInteger
-from typing import Optional, List
+
 from datetime import datetime
 from enum import Enum
+from typing import List, Optional
+
+from sqlalchemy import JSON, BigInteger
+from sqlmodel import Column, Field, Relationship, SQLModel
+
+# ============================
+# Enums
+# ============================
 
 
 class Priority(str, Enum):
-    """Task priority levels"""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
 
 class ActionType(str, Enum):
-    """Activity log action types"""
     CREATED = "created"
     UPDATED = "updated"
     COMPLETED = "completed"
@@ -22,152 +26,262 @@ class ActionType(str, Enum):
     RESTORED = "restored"
 
 
+# ============================
+# User
+# ============================
+
+
 class User(SQLModel, table=True):
     """User model for authentication"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    email: str = Field(unique=True, index=True, max_length=255)
+
+    # ❗ FIXED: unique handled via sa_column_kwargs (no crash)
+    email: str = Field(
+        index=True,
+        max_length=255,
+        sa_column_kwargs={"unique": True},
+    )
+
     hashed_password: str = Field(max_length=255)
     full_name: Optional[str] = Field(default=None, max_length=200)
-    is_active: bool = Field(default=False)  # False until email verified
+
+    is_active: bool = Field(default=False)
     is_verified: bool = Field(default=False)
     verification_token: Optional[str] = Field(default=None, max_length=255)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    tasks: List["Task"] = Relationship(back_populates="user")
+    tasks: List["Task"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"foreign_keys": "[Task.user_id]"},
+    )
+
+
+# ============================
+# Task
+# ============================
 
 
 class Task(SQLModel, table=True):
     """Main task model"""
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", index=True)  # NEW: user association
+
+    user_id: int = Field(foreign_key="user.id", index=True)
+
     title: str = Field(index=True, max_length=500)
     description: Optional[str] = Field(default=None, max_length=5000)
+
     completed: bool = Field(default=False, index=True)
     priority: Priority = Field(default=Priority.MEDIUM, index=True)
-    tags: Optional[str] = Field(default=None, max_length=1000)  # Comma-separated tags
 
-    # Phase V: Due Dates & Reminders
+    # JSON-safe storage
+    tags: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+    )
+
+    # Phase V
     due_date: Optional[datetime] = Field(default=None, index=True)
     reminder_time: Optional[datetime] = Field(default=None, index=True)
 
-    # Phase V: Recurring Tasks
     is_recurring: bool = Field(default=False, index=True)
-    recurrence_pattern: Optional[str] = Field(default=None, max_length=50)  # daily, weekly, monthly, etc.
+    recurrence_pattern: Optional[str] = Field(default=None, max_length=50)
     recurrence_end_date: Optional[datetime] = Field(default=None)
 
     display_order: int = Field(default=0, index=True)
     is_template: bool = Field(default=False, index=True)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships
     user: Optional[User] = Relationship(back_populates="tasks")
-    subtasks: List["Subtask"] = Relationship(back_populates="task", cascade_delete=True)
-    notes: List["Note"] = Relationship(back_populates="task", cascade_delete=True)
-    attachments: List["Attachment"] = Relationship(back_populates="task", cascade_delete=True)
-    activity_logs: List["ActivityLog"] = Relationship(back_populates="task", cascade_delete=True)
+
+    subtasks: List["Subtask"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"foreign_keys": "[Subtask.task_id]"},
+    )
+
+    notes: List["Note"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"foreign_keys": "[Note.task_id]"},
+    )
+
+    attachments: List["Attachment"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"foreign_keys": "[Attachment.task_id]"},
+    )
+
+    activity_logs: List["ActivityLog"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"foreign_keys": "[ActivityLog.task_id]"},
+    )
+
+
+# ============================
+# Subtask
+# ============================
 
 
 class Subtask(SQLModel, table=True):
-    """Subtask model for task checklists"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     task_id: int = Field(foreign_key="task.id", index=True)
     user_id: int = Field(foreign_key="user.id", index=True)
+
     title: str = Field(max_length=500)
     completed: bool = Field(default=False)
     display_order: int = Field(default=0, index=True)
+
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relationships
     task: Optional[Task] = Relationship(back_populates="subtasks")
 
 
+# ============================
+# Note
+# ============================
+
+
 class Note(SQLModel, table=True):
-    """Note model for task notes"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     task_id: int = Field(foreign_key="task.id", index=True)
     user_id: int = Field(foreign_key="user.id", index=True)
+
     content: str = Field(max_length=5000)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relationships
     task: Optional[Task] = Relationship(back_populates="notes")
 
 
+# ============================
+# Attachment
+# ============================
+
+
 class Attachment(SQLModel, table=True):
-    """Attachment model for task file attachments"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     task_id: int = Field(foreign_key="task.id", index=True)
     user_id: int = Field(foreign_key="user.id", index=True)
+
     filename: str = Field(max_length=255)
     file_url: str = Field(max_length=1000)
-    file_size: int = Field(default=0)  # Size in bytes
+    file_size: int = Field(default=0)
     mime_type: str = Field(max_length=100)
+
     ocr_text: Optional[str] = Field(default=None, max_length=10000)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
 
-    # Relationships
     task: Optional[Task] = Relationship(back_populates="attachments")
 
 
+# ============================
+# Template
+# ============================
+
+
 class Template(SQLModel, table=True):
-    """Template model for task templates"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     name: str = Field(index=True, max_length=200)
     title: str = Field(max_length=500)
     description: Optional[str] = Field(default=None, max_length=5000)
     priority: Priority = Field(default=Priority.MEDIUM)
-    tags: Optional[str] = Field(default=None, max_length=1000)
-    subtasks: Optional[str] = Field(default=None, max_length=10000)  # JSON array of subtask titles
+
+    tags: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+    )
+
+    subtasks: Optional[list[str]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+    )
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+# ============================
+# Activity Log
+# ============================
+
+
 class ActivityLog(SQLModel, table=True):
-    """Activity log model for tracking task changes"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     task_id: int = Field(foreign_key="task.id", index=True)
     action_type: ActionType = Field(index=True)
+
     field_changed: Optional[str] = Field(default=None, max_length=100)
     old_value: Optional[str] = Field(default=None, max_length=1000)
     new_value: Optional[str] = Field(default=None, max_length=1000)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
-    
-    # Relationships
+
     task: Optional[Task] = Relationship(back_populates="activity_logs")
 
 
+# ============================
+# Voice Commands
+# ============================
+
+
 class VoiceCommand(SQLModel, table=True):
-    """Voice command model for tracking voice interactions"""
     id: Optional[int] = Field(default=None, primary_key=True)
+
     transcript: str = Field(max_length=2000)
-    language: str = Field(max_length=10, index=True)  # en, ur, ar, es, fr, de
-    intent: Optional[str] = Field(default=None, max_length=100)  # create, update, delete, complete
-    confidence: Optional[float] = Field(default=None)  # 0.0 to 1.0
+    language: str = Field(max_length=10, index=True)
+    intent: Optional[str] = Field(default=None, max_length=100)
+    confidence: Optional[float] = Field(default=None)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+
+# ============================
+# Chat Messages
+# ============================
 
 
 class ChatMessage(SQLModel, table=True):
-    """Chat message model for AI chatbot conversations"""
     id: Optional[int] = Field(default=None, primary_key=True)
-    role: str = Field(max_length=20)  # user, assistant
+
+    role: str = Field(max_length=20)
     content: str = Field(max_length=10000)
     language: str = Field(max_length=10, index=True)
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
 
 
+# ============================
+# Conversation Messages (Phase III)
+# ============================
+
+
 class ConversationMessage(SQLModel, table=True):
-    """Conversation message model for Phase III AI chatbot with stateless persistence"""
     __tablename__ = "conversation_messages"
 
     id: Optional[int] = Field(default=None, primary_key=True)
+
     conversation_id: int = Field(sa_column=Column(BigInteger, index=True))
+
     user_id: int = Field(foreign_key="user.id", index=True)
-    role: str = Field(max_length=20)  # user, assistant, system
+    role: str = Field(max_length=20)
     content: str
-    tool_calls: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+
+    tool_calls: Optional[dict] = Field(
+        default=None,
+        sa_column=Column(JSON),
+    )
+
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
