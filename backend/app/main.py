@@ -40,7 +40,7 @@ app = FastAPI(
 # Configure CORS - allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",  # Allow any localhost/127.0.0.1 port
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|todo\.local)(:\d+)?",  # Allow localhost, 127.0.0.1, and todo.local
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
