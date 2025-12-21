@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: production
+data:
+  # Frontend URL (update with your domain or LoadBalancer IP)
+  FRONTEND_URL: "http://your-loadbalancer-ip.nip.io"
+
+  # Backend API URL
+  BACKEND_URL: "http://todo-backend:8000"
+
+  # Environment
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+
+  # CORS origins (update with your domain)
+  CORS_ORIGINS: "http://your-loadbalancer-ip.nip.io,https://your-domain.com"
