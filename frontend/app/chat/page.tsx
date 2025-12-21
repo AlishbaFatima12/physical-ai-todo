@@ -6,6 +6,8 @@ import { createTask, getTasks, updateTask, deleteTask } from "@/lib/api";
 import { Task } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -97,7 +99,7 @@ export default function ChatPage() {
     setAuthError(false);
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/chat", {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

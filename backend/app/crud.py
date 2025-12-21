@@ -27,16 +27,13 @@ def create_task(task_data: TaskCreate, session: Session, user_id: int) -> Task:
     Returns:
         Created Task object with generated ID and timestamps
     """
-    # Convert tags list to JSON string for storage
-    tags_json = json.dumps(task_data.tags)
-
     # Create new task instance
     db_task = Task(
         user_id=user_id,
         title=task_data.title,
         description=task_data.description,
         priority=task_data.priority,
-        tags=tags_json,
+        tags=task_data.tags,  # SQLModel with Column(JSON) handles serialization automatically
         completed=False,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
