@@ -106,7 +106,7 @@ export default function Home() {
             <button
               onClick={() => {
                 document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                window.location.href = '/auth/signin';
+                window.location.href = '/landing';
               }}
               className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-md rounded-lg p-2.5 transition-all shadow-lg hover:shadow-xl"
               title="Logout"
