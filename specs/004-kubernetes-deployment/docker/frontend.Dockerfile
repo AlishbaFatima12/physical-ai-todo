@@ -8,8 +8,8 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Copy package files from frontend directory
+COPY frontend/package.json frontend/package-lock.json* ./
 
 # Install ALL dependencies (including devDependencies needed for build)
 RUN npm ci
@@ -23,13 +23,13 @@ WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY frontend/ .
 
 # Set environment for build
 # CRITICAL: NEXT_PUBLIC_* vars must be set BEFORE build (baked into bundle)
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
-    NEXT_PUBLIC_API_URL=http://backend:8000/api/v1
+    NEXT_PUBLIC_API_URL=http://127.0.0.1:59423/api/v1
 
 # Build Next.js app (standalone output for smaller image)
 RUN npm run build
@@ -48,7 +48,8 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
