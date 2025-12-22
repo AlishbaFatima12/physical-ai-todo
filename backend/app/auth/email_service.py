@@ -10,16 +10,19 @@ def send_verification_email(to_email: str, verification_token: str, user_name: O
     """Send email verification email using Resend"""
     # Check if API key is properly configured (not placeholder)
     is_valid_key = resend.api_key and not resend.api_key.startswith('re_123456789')
-    
+
+    # Use FRONTEND_URL from environment or default to todo.local
+    frontend_url = os.getenv("FRONTEND_URL", "http://todo.local")
+
     if not is_valid_key:
         print("\n" + "="*80)
         print(f"[EMAIL] Verification email for: {to_email}")
-        print(f"[LINK]  http://localhost:3001/auth/verify-email?token={verification_token}")
+        print(f"[LINK]  {frontend_url}/auth/verify-email?token={verification_token}")
         print("="*80 + "\n")
         return True  # Return True in development mode
 
     display_name = user_name or to_email.split('@')[0]
-    verification_url = f"http://localhost:3001/auth/verify-email?token={verification_token}"
+    verification_url = f"{frontend_url}/auth/verify-email?token={verification_token}"
 
     try:
         resend.Emails.send({
@@ -69,9 +72,10 @@ def send_verification_email(to_email: str, verification_token: str, user_name: O
         print(f"[EMAIL] Verification email sent successfully to: {to_email}")
         return True
     except Exception as e:
+        frontend_url = os.getenv("FRONTEND_URL", "http://todo.local")
         print(f"\n[ERROR] Failed to send email: {e}")
         print(f"[EMAIL] Verification email for: {to_email}")
-        print(f"[LINK]  http://localhost:3001/auth/verify-email?token={verification_token}")
+        print(f"[LINK]  {frontend_url}/auth/verify-email?token={verification_token}")
         print("="*80 + "\n")
         return False
 
@@ -80,7 +84,10 @@ def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
     """Send welcome email after verification"""
     # Check if API key is properly configured (not placeholder)
     is_valid_key = resend.api_key and not resend.api_key.startswith('re_123456789')
-    
+
+    # Use FRONTEND_URL from environment or default to todo.local
+    frontend_url = os.getenv("FRONTEND_URL", "http://todo.local")
+
     if not is_valid_key:
         print(f"\n[EMAIL] Welcome email would be sent to: {to_email}\n")
         return True
@@ -131,7 +138,7 @@ def send_welcome_email(to_email: str, user_name: Optional[str] = None) -> bool:
                         </div>
 
                         <div style="text-align: center;">
-                            <a href="http://localhost:3001/dashboard" class="button">Go to Dashboard</a>
+                            <a href="{frontend_url}/dashboard" class="button">Go to Dashboard</a>
                         </div>
                     </div>
                     <div style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 30px;">

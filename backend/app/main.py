@@ -37,10 +37,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS - allow all origins for development
+# Configure CORS - get allowed origins from environment or use default
+cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3001,http://localhost:3000,http://todo.local,http://161-35-250-151.nip.io")
+cors_origins_list = [origin.strip() for origin in cors_origins_str.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",  # Allow any localhost/127.0.0.1 port
+    allow_origins=cors_origins_list,  # Allow origins from environment variable
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
