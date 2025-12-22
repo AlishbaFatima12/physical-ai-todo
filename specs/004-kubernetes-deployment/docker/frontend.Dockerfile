@@ -27,10 +27,10 @@ COPY frontend/ .
 
 # Set environment for build
 # CRITICAL: NEXT_PUBLIC_* vars must be set BEFORE build (baked into bundle)
-# Using fixed hostname via Ingress - URLs never change on restart!
+# Using custom subdomain for better branding
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
-    NEXT_PUBLIC_API_URL=http://161-35-250-151.nip.io/api/v1
+    NEXT_PUBLIC_API_URL=http://alishba-ai-todo.161-35-250-151.nip.io/api/v1
 
 # Build Next.js app (standalone output for smaller image)
 RUN npm run build
