@@ -17,6 +17,8 @@ spec:
         app: todo-backend
         tier: backend
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: backend
         image: registry.digitalocean.com/physical-ai-todo-registry/todo-frontend:backend
