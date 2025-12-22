@@ -113,8 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Don't log in automatically - user needs to verify email
-    router.push('/auth/verify-email?registered=true')
+    // Email verification disabled for hackathon demo - auto-login after signup
+    // Users are auto-verified on the backend, so we can log them in immediately
+    await login(email, password)
   }
 
   const logout = async () => {
