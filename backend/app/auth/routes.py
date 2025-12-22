@@ -76,13 +76,13 @@ def register(
     # Create verification token
     verification_token = secrets.token_urlsafe(32)
 
-    # Create new user
+    # Create new user (AUTO-VERIFIED for hackathon demo)
     new_user = User(
         email=normalized_email,  # Store normalized (lowercase) email
         hashed_password=hash_password(user_data.password),
         full_name=user_data.full_name,
-        is_active=False,  # Not active until verified
-        is_verified=False,
+        is_active=True,  # Auto-activated (email verification disabled)
+        is_verified=True,  # Auto-verified (email verification disabled)
         verification_token=verification_token,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
@@ -92,12 +92,12 @@ def register(
     session.commit()
     session.refresh(new_user)
 
-    # Send verification email
-    send_verification_email(
-        to_email=new_user.email,
-        verification_token=verification_token,
-        user_name=new_user.full_name
-    )
+    # Email verification disabled for hackathon demo
+    # send_verification_email(
+    #     to_email=new_user.email,
+    #     verification_token=verification_token,
+    #     user_name=new_user.full_name
+    # )
 
     return new_user
 

@@ -1,7 +1,7 @@
 # ===================================
 # Stage 1: Base Python Image
 # ===================================
-FROM python:3.13-slim AS base
+FROM python:3.12-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -16,9 +16,11 @@ WORKDIR /app
 # ===================================
 FROM base AS dependencies
 
-# Install system dependencies
+# Install system dependencies (including PostgreSQL dev headers for psycopg2)
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
+    libpq-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +34,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM base AS production
 
 # Copy installed dependencies from dependencies stage
-COPY --from=dependencies /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=dependencies /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy application code
