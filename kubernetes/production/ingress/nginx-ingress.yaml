@@ -28,7 +28,7 @@ spec:
   rules:
   # Update with your domain or use nip.io with LoadBalancer IP
   # Example: 157-230-123-45.nip.io
-  - host: YOUR_DOMAIN_OR_IP.nip.io
+  - host: 161-35-250-151.nip.io
     http:
       paths:
       # Backend API routes

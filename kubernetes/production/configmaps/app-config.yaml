@@ -5,7 +5,7 @@ metadata:
   namespace: production
 data:
   # Frontend URL (update with your domain or LoadBalancer IP)
-  FRONTEND_URL: "http://your-loadbalancer-ip.nip.io"
+  FRONTEND_URL: "http://161-35-250-151.nip.io"
 
   # Backend API URL
   BACKEND_URL: "http://todo-backend:8000"
@@ -15,4 +15,4 @@ data:
   LOG_LEVEL: "info"
 
   # CORS origins (update with your domain)
-  CORS_ORIGINS: "http://your-loadbalancer-ip.nip.io,https://your-domain.com"
+  CORS_ORIGINS: "http://161-35-250-151.nip.io,https://your-domain.com"
