@@ -30,7 +30,7 @@ COPY frontend/ .
 # Using fixed hostname via Ingress - URLs never change on restart!
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
-    NEXT_PUBLIC_API_URL=http://todo.local/api/v1
+    NEXT_PUBLIC_API_URL=http://161-35-250-151.nip.io/api/v1
 
 # Build Next.js app (standalone output for smaller image)
 RUN npm run build
