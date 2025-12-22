@@ -16,9 +16,10 @@ WORKDIR /app
 # ===================================
 FROM base AS dependencies
 
-# Install system dependencies
+# Install system dependencies (including PostgreSQL dev headers for psycopg2)
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
