@@ -67,3 +67,6 @@ htmlcov/
 # Local settings
 .claude/settings.local.json
 nul
+deploy-to-production.cmd
+k8s-1-32-10-do-2-nyc3-1766308114429-kubeconfig.yaml
+kubeconfig.yaml
