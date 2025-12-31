@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ===================================
@@ -33,7 +33,7 @@ FROM base AS prod
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps /usr/local/bin /usr/local/bin
 
-COPY . .
+COPY backend/ .
 
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
