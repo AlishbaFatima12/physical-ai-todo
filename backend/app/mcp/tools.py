@@ -12,6 +12,7 @@ using the existing CRUD functions from app.crud.
 import json
 from typing import Dict, Any, List
 from sqlmodel import Session
+from datetime import datetime
 
 from app.crud import (
     create_task,
@@ -21,6 +22,7 @@ from app.crud import (
     delete_task as crud_delete_task
 )
 from app.schemas import TaskCreate, TaskPatch
+from app.models import Notification
 from app.mcp.schemas import (
     AddTaskSchema,
     ListTasksSchema,
@@ -51,6 +53,21 @@ def add_task(params: AddTaskSchema, session: Session) -> Dict[str, Any]:
         )
 
         task = create_task(task_data, session, params.user_id)
+
+        # Create notification for task creation (instant notification)
+        print(f"DEBUG add_task: Creating notification for task '{task.title}' (ID {task.id})")
+        notification = Notification(
+            user_id=params.user_id,
+            task_id=task.id,
+            type="task_created",
+            title=f"✅ Task Created",
+            message=f'Created task: "{task.title}"',
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+        session.add(notification)
+        session.commit()
+        print(f"DEBUG add_task: Notification created and committed!")
 
         return {
             "success": True,
@@ -207,6 +224,19 @@ def complete_task_tool(params: CompleteTaskSchema, session: Session) -> Dict[str
         task_patch = TaskPatch(completed=True)
         updated_task = patch_task(task_id_to_complete, task_patch, session)
 
+        # Create notification for task completion
+        notification = Notification(
+            user_id=params.user_id,
+            task_id=updated_task.id,
+            type="task_completed",
+            title=f"🎉 Task Completed",
+            message=f'Completed: "{updated_task.title}"',
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+        session.add(notification)
+        session.commit()
+
         return {
             "success": True,
             "task_id": updated_task.id,
@@ -314,8 +344,24 @@ def delete_task_tool(params: DeleteTaskSchema, session: Session) -> Dict[str, An
         # Store title before deletion
         task_title = task.title
 
-        # Delete task
+        # Delete task first
         deleted = crud_delete_task(task_id_to_delete, session)
+
+        # Create notification AFTER deletion
+        if deleted:
+            print(f"DEBUG delete_task_tool: Creating notification for deleted task '{task_title}' (ID {task_id_to_delete})")
+            notification = Notification(
+                user_id=params.user_id,
+                task_id=task_id_to_delete,
+                type="task_deleted",
+                title=f"🗑️ Task Deleted",
+                message=f'Deleted: "{task_title}"',
+                is_read=False,
+                created_at=datetime.utcnow()
+            )
+            session.add(notification)
+            session.commit()
+            print(f"DEBUG delete_task_tool: Notification created and committed!")
 
         if deleted:
             return {
@@ -427,6 +473,19 @@ def update_task_tool(params: UpdateTaskSchema, session: Session) -> Dict[str, An
         # Update task
         task_patch = TaskPatch(**update_data)
         updated_task = patch_task(task_id_to_update, task_patch, session)
+
+        # Create notification for task update
+        notification = Notification(
+            user_id=params.user_id,
+            task_id=updated_task.id,
+            type="task_updated",
+            title=f"✏️ Task Updated",
+            message=f'Updated: "{updated_task.title}"',
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+        session.add(notification)
+        session.commit()
 
         return {
             "success": True,

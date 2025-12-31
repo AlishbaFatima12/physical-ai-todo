@@ -10,7 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import attachments, notes, subtasks
 from app.auth import routes as auth
 from app.database import init_db
-from app.routes import chat, tasks
+from app.routes import chat, tasks, notifications
+from app.scheduler import start_scheduler, shutdown_scheduler
 
 # Load environment variables
 load_dotenv()
@@ -24,9 +25,15 @@ async def lifespan(app: FastAPI):
     print("Initializing database...")
     init_db()
     print("Database initialized successfully")
+    print("Starting background scheduler...")
+    start_scheduler()
+    print("Background scheduler started successfully")
     yield
     # Shutdown
     print("Shutting down Physical AI Todo API")
+    print("Stopping background scheduler...")
+    shutdown_scheduler()
+    print("Background scheduler stopped")
 
 
 # Initialize FastAPI app
@@ -57,6 +64,7 @@ app.include_router(subtasks.router)  # Subtask routes (protected)
 app.include_router(notes.router)  # Note routes (protected)
 app.include_router(attachments.router)  # Attachment routes (protected)
 app.include_router(chat.router, prefix="/api/v1")  # Chat routes (protected) - Phase III
+app.include_router(notifications.router)  # Notification routes (protected) - Phase VI
 
 
 # Health check endpoint

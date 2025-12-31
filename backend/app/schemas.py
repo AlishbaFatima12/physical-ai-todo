@@ -1,7 +1,7 @@
 """Pydantic schemas for request/response validation"""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.models import Priority, ActionType
 
 
@@ -15,7 +15,8 @@ class TaskBase(BaseModel):
 
     # Phase V: Due Dates & Reminders
     due_date: Optional[datetime] = None
-    reminder_time: Optional[datetime] = None
+    reminder_offset: Optional[str] = Field(None, max_length=10)  # "1h", "1d", "3d", "5d", "1w", or None
+    reminder_time: Optional[datetime] = None  # Calculated by backend
 
     # Phase V: Recurring Tasks
     is_recurring: bool = False
@@ -26,6 +27,24 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     """Schema for creating a task"""
     display_order: Optional[int] = 0
+
+    @field_validator('due_date')
+    @classmethod
+    def due_date_must_be_future(cls, v):
+        if v:
+            # Make timezone-naive for comparison
+            now = datetime.utcnow()
+            check_time = v.replace(tzinfo=None) if v.tzinfo else v
+            if check_time <= now:
+                raise ValueError('Due date must be in the future')
+        return v
+
+    @field_validator('reminder_offset')
+    @classmethod
+    def validate_reminder_offset(cls, v):
+        if v and v not in ["1h", "1d", "3d", "5d", "1w"]:
+            raise ValueError('Invalid reminder offset. Must be one of: 1h, 1d, 3d, 5d, 1w')
+        return v
 
 
 class TaskUpdate(BaseModel):
@@ -39,12 +58,20 @@ class TaskUpdate(BaseModel):
 
     # Phase V: Due Dates & Reminders
     due_date: Optional[datetime] = None
-    reminder_time: Optional[datetime] = None
+    reminder_offset: Optional[str] = Field(None, max_length=10)
+    reminder_time: Optional[datetime] = None  # Calculated by backend
 
     # Phase V: Recurring Tasks
     is_recurring: Optional[bool] = None
     recurrence_pattern: Optional[str] = None
     recurrence_end_date: Optional[datetime] = None
+
+    @field_validator('reminder_offset')
+    @classmethod
+    def validate_reminder_offset(cls, v):
+        if v and v not in ["1h", "1d", "3d", "5d", "1w"]:
+            raise ValueError('Invalid reminder offset. Must be one of: 1h, 1d, 3d, 5d, 1w')
+        return v
 
 
 class TaskPatch(BaseModel):
@@ -58,12 +85,20 @@ class TaskPatch(BaseModel):
 
     # Phase V: Due Dates & Reminders
     due_date: Optional[datetime] = None
-    reminder_time: Optional[datetime] = None
+    reminder_offset: Optional[str] = Field(None, max_length=10)
+    reminder_time: Optional[datetime] = None  # Calculated by backend
 
     # Phase V: Recurring Tasks
     is_recurring: Optional[bool] = None
     recurrence_pattern: Optional[str] = None
     recurrence_end_date: Optional[datetime] = None
+
+    @field_validator('reminder_offset')
+    @classmethod
+    def validate_reminder_offset(cls, v):
+        if v and v not in ["1h", "1d", "3d", "5d", "1w"]:
+            raise ValueError('Invalid reminder offset. Must be one of: 1h, 1d, 3d, 5d, 1w')
+        return v
 
 
 class SubtaskResponse(BaseModel):
@@ -216,6 +251,36 @@ class TemplateResponse(TemplateCreate):
         from_attributes = True
 
 
+# Notification schemas
+class NotificationCreate(BaseModel):
+    """Schema for creating a notification"""
+    user_id: int
+    task_id: int
+    type: str = Field(..., max_length=50)  # "reminder" or "overdue"
+    title: str = Field(..., max_length=200)
+    message: str = Field(..., max_length=500)
+
+
+class NotificationRead(BaseModel):
+    """Schema for reading a notification"""
+    id: int
+    user_id: int
+    task_id: int
+    type: str
+    title: str
+    message: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class NotificationUpdate(BaseModel):
+    """Schema for updating a notification (mark as read)"""
+    is_read: bool
+
+
 # Bulk operation schemas
 class BulkOperationRequest(BaseModel):
     """Schema for bulk operations"""
@@ -236,3 +301,32 @@ class BulkPriorityRequest(BulkOperationRequest):
 class ReorderRequest(BaseModel):
     """Schema for reordering tasks/subtasks"""
     items: List[dict]  # [{"id": 1, "display_order": 0}, ...]
+
+
+# ============================================================================
+# Notification Schemas (Phase VI: Task Reminders & Notifications)
+# ============================================================================
+
+
+class NotificationCreate(BaseModel):
+    """Schema for creating a notification"""
+    user_id: int
+    task_id: int
+    type: str = Field(..., max_length=50)  # "reminder" or "overdue"
+    title: str = Field(..., max_length=200)
+    message: str = Field(..., max_length=500)
+    is_read: bool = False
+
+
+class NotificationRead(BaseModel):
+    """Schema for reading a notification"""
+    id: int
+    user_id: int
+    task_id: int
+    type: str
+    title: str
+    message: str
+    is_read: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

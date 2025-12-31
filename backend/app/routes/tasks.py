@@ -25,8 +25,27 @@ from app.schemas import (
     TaskRead,
     TaskUpdate,
 )
+from app.models import Notification
+from datetime import datetime
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])
+
+
+def _task_to_read(db_task) -> TaskRead:
+    """Convert database Task model to TaskRead schema."""
+    return TaskRead(
+        id=db_task.id,
+        title=db_task.title,
+        description=db_task.description,
+        completed=db_task.completed,
+        priority=db_task.priority,
+        tags=json.loads(db_task.tags) if db_task.tags else [],
+        created_at=db_task.created_at,
+        updated_at=db_task.updated_at,
+        due_date=db_task.due_date,
+        reminder_offset=db_task.reminder_offset,
+        reminder_time=db_task.reminder_time,
+    )
 
 
 @router.get("", response_model=TaskListResponse)
@@ -79,20 +98,8 @@ def get_tasks(
         order=order,
     )
 
-    # Convert tags from JSON string to list for each task
-    tasks_with_parsed_tags = []
-    for task in tasks:
-        task_dict = {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "completed": task.completed,
-            "priority": task.priority,
-            "tags": db_task.tags if db_task.tags else [],
-            "created_at": task.created_at,
-            "updated_at": task.updated_at,
-        }
-        tasks_with_parsed_tags.append(TaskRead(**task_dict))
+    # Convert tasks to TaskRead schema
+    tasks_with_parsed_tags = [_task_to_read(task) for task in tasks]
 
     return TaskListResponse(
         tasks=tasks_with_parsed_tags, total=total, limit=limit, offset=offset
@@ -113,23 +120,28 @@ def create_task(
     - **description**: Task description (optional, max 2000 chars)
     - **priority**: Priority level (high/medium/low, default: medium)
     - **tags**: Array of tag strings (default: [])
+    - **due_date**: Due date and time (optional, ISO 8601 format)
+    - **reminder_offset**: Reminder offset (optional, one of: 1h/1d/3d/5d/1w)
 
     **Returns:**
-    - Created task with ID and timestamps
+    - Created task with ID, timestamps, and calculated reminder_time
     """
     db_task = crud.create_task(task_data, session, user_id=current_user.id)
 
-    # Parse tags from JSON string
-    return TaskRead(
-        id=db_task.id,
-        title=db_task.title,
-        description=db_task.description,
-        completed=db_task.completed,
-        priority=db_task.priority,
-        tags=db_task.tags if db_task.tags else [],
-        created_at=db_task.created_at,
-        updated_at=db_task.updated_at,
+    # Create notification for task creation
+    notification = Notification(
+        user_id=current_user.id,
+        task_id=db_task.id,
+        type="task_created",
+        title=f"✅ Task Created",
+        message=f'Created task: "{db_task.title}"',
+        is_read=False,
+        created_at=datetime.utcnow()
     )
+    session.add(notification)
+    session.commit()
+
+    return _task_to_read(db_task)
 
 
 @router.get("/{task_id}", response_model=TaskRead)
@@ -154,16 +166,7 @@ def get_task(
     if not db_task or db_task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
-    return TaskRead(
-        id=db_task.id,
-        title=db_task.title,
-        description=db_task.description,
-        completed=db_task.completed,
-        priority=db_task.priority,
-        tags=db_task.tags if db_task.tags else [],
-        created_at=db_task.created_at,
-        updated_at=db_task.updated_at,
-    )
+    return _task_to_read(db_task)
 
 
 @router.put("/{task_id}", response_model=TaskRead)
@@ -180,10 +183,10 @@ def update_task(
     - **task_id**: Task ID to update
 
     **Request Body:**
-    - All task fields (title, description, priority, tags, completed)
+    - All task fields (title, description, priority, tags, completed, due_date, reminder_offset)
 
     **Returns:**
-    - Updated task
+    - Updated task with recalculated reminder_time
 
     **Raises:**
     - 404: Task not found
@@ -197,16 +200,7 @@ def update_task(
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
-    return TaskRead(
-        id=db_task.id,
-        title=db_task.title,
-        description=db_task.description,
-        completed=db_task.completed,
-        priority=db_task.priority,
-        tags=db_task.tags if db_task.tags else [],
-        created_at=db_task.created_at,
-        updated_at=db_task.updated_at,
-    )
+    return _task_to_read(db_task)
 
 
 @router.patch("/{task_id}", response_model=TaskRead)
@@ -245,16 +239,20 @@ def patch_task(
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
-    return TaskRead(
-        id=db_task.id,
-        title=db_task.title,
-        description=db_task.description,
-        completed=db_task.completed,
-        priority=db_task.priority,
-        tags=db_task.tags if db_task.tags else [],
-        created_at=db_task.created_at,
-        updated_at=db_task.updated_at,
+    # Create notification for task update
+    notification = Notification(
+        user_id=current_user.id,
+        task_id=db_task.id,
+        type="task_updated",
+        title=f"✏️ Task Updated",
+        message=f'Updated: "{db_task.title}"',
+        is_read=False,
+        created_at=datetime.utcnow()
     )
+    session.add(notification)
+    session.commit()
+
+    return _task_to_read(db_task)
 
 
 @router.delete("/{task_id}", status_code=204)
@@ -279,6 +277,20 @@ def delete_task(
     existing_task = crud.get_task(task_id, session)
     if not existing_task or existing_task.user_id != current_user.id:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
+
+    # Create notification BEFORE deleting (we need the task title)
+    task_title = existing_task.title
+    notification = Notification(
+        user_id=current_user.id,
+        task_id=task_id,
+        type="task_deleted",
+        title=f"🗑️ Task Deleted",
+        message=f'Deleted: "{task_title}"',
+        is_read=False,
+        created_at=datetime.utcnow()
+    )
+    session.add(notification)
+    session.commit()
 
     deleted = crud.delete_task(task_id, session)
     if not deleted:
@@ -314,16 +326,31 @@ def toggle_task_completion(
     if not db_task:
         raise HTTPException(status_code=404, detail=f"Task with ID {task_id} not found")
 
-    return TaskRead(
-        id=db_task.id,
-        title=db_task.title,
-        description=db_task.description,
-        completed=db_task.completed,
-        priority=db_task.priority,
-        tags=db_task.tags if db_task.tags else [],
-        created_at=db_task.created_at,
-        updated_at=db_task.updated_at,
-    )
+    # Create notification for task completion/uncomplete
+    if db_task.completed:
+        notification = Notification(
+            user_id=current_user.id,
+            task_id=db_task.id,
+            type="task_completed",
+            title=f"🎉 Task Completed",
+            message=f'Completed: "{db_task.title}"',
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+    else:
+        notification = Notification(
+            user_id=current_user.id,
+            task_id=db_task.id,
+            type="task_reopened",
+            title=f"🔄 Task Reopened",
+            message=f'Reopened: "{db_task.title}"',
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+    session.add(notification)
+    session.commit()
+
+    return _task_to_read(db_task)
 
 
 # ============================================================================

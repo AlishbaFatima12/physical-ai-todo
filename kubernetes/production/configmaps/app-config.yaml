@@ -16,3 +16,6 @@ data:
 
   # CORS origins (update with your domain)
   CORS_ORIGINS: "http://161-35-250-151.nip.io,https://your-domain.com"
+
+  # Email configuration
+  FROM_EMAIL: "onboarding@resend.dev"
