@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Deploy when pushing to main branch
+      - 006-task-reminders  # Deploy from feature branch
   workflow_dispatch:  # Allow manual trigger
 
 env:
@@ -28,24 +29,24 @@ jobs:
 
       - name: Build Backend Docker Image
         run: |
-          docker build -f backend/Dockerfile \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-backend:${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-backend:latest \
-            ./backend
+          docker build -f specs/004-kubernetes-deployment/docker/backend.Dockerfile \
+            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend-${{ github.sha }} \
+            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend \
+            .
 
       - name: Build Frontend Docker Image
         run: |
           docker build -f specs/004-kubernetes-deployment/docker/frontend.Dockerfile \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:latest \
+            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend-${{ github.sha }} \
+            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend \
             .
 
       - name: Push Images to Registry
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-backend:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-backend:latest
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:latest
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend
 
       - name: Update kubeconfig
         run: doctl kubernetes cluster kubeconfig save ${{ env.CLUSTER_NAME }}
