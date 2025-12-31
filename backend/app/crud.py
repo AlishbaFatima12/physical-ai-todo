@@ -11,8 +11,9 @@ from typing import List, Optional, Tuple
 from sqlalchemy import select, func, or_
 from sqlmodel import Session, col
 
-from app.models import Task, ConversationMessage
+from app.models import Task, ConversationMessage, Notification
 from app.schemas import TaskCreate, TaskUpdate, TaskPatch
+from app.utils.reminder_calculator import calculate_reminder_time
 
 
 def create_task(task_data: TaskCreate, session: Session, user_id: int) -> Task:
@@ -20,13 +21,18 @@ def create_task(task_data: TaskCreate, session: Session, user_id: int) -> Task:
     Create a new task in the database.
 
     Args:
-        task_data: Task creation data (title, description, priority, tags)
+        task_data: Task creation data (title, description, priority, tags, due_date, reminder_offset)
         session: Async database session
         user_id: ID of the user creating the task
 
     Returns:
         Created Task object with generated ID and timestamps
     """
+    # Calculate reminder_time if due_date and reminder_offset provided
+    reminder_time = None
+    if task_data.due_date and task_data.reminder_offset:
+        reminder_time = calculate_reminder_time(task_data.due_date, task_data.reminder_offset)
+
     # Create new task instance
     db_task = Task(
         user_id=user_id,
@@ -35,6 +41,9 @@ def create_task(task_data: TaskCreate, session: Session, user_id: int) -> Task:
         priority=task_data.priority,
         tags=task_data.tags,  # SQLModel with Column(JSON) handles serialization automatically
         completed=False,
+        due_date=task_data.due_date,
+        reminder_offset=task_data.reminder_offset,
+        reminder_time=reminder_time,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
     )
@@ -153,12 +162,31 @@ def update_task(task_id: int, task_data: TaskUpdate, session: Session) -> Option
     if not db_task:
         return None
 
+    # Save old values before updating
+    old_reminder_time = db_task.reminder_time
+    old_due_date = db_task.due_date
+
+    # Calculate reminder_time if due_date and reminder_offset provided
+    reminder_time = None
+    if task_data.due_date and task_data.reminder_offset:
+        reminder_time = calculate_reminder_time(task_data.due_date, task_data.reminder_offset)
+
     # Update all fields
     db_task.title = task_data.title
     db_task.description = task_data.description
     db_task.priority = task_data.priority
     db_task.tags = json.dumps(task_data.tags)
     db_task.completed = task_data.completed
+    db_task.due_date = task_data.due_date
+    db_task.reminder_offset = task_data.reminder_offset
+    db_task.reminder_time = reminder_time
+
+    # Reset reminder/overdue tracking when reminder_time or due_date changes
+    if old_reminder_time != reminder_time:
+        db_task.last_reminder_sent = None
+    if old_due_date != task_data.due_date:
+        db_task.last_overdue_notification_sent = None
+
     db_task.updated_at = datetime.utcnow()
 
     session.add(db_task)
@@ -192,6 +220,27 @@ def patch_task(task_id: int, task_data: TaskPatch, session: Session) -> Optional
             setattr(db_task, field, json.dumps(value))
         elif value is not None:
             setattr(db_task, field, value)
+
+    # Recalculate reminder_time if due_date or reminder_offset changed
+    if 'due_date' in update_data or 'reminder_offset' in update_data:
+        old_reminder_time = db_task.reminder_time
+        old_due_date = db_task.due_date
+
+        # Use updated values if provided, otherwise keep existing
+        due_date = update_data.get('due_date', db_task.due_date)
+        reminder_offset = update_data.get('reminder_offset', db_task.reminder_offset)
+
+        # Calculate new reminder_time
+        if due_date and reminder_offset:
+            db_task.reminder_time = calculate_reminder_time(due_date, reminder_offset)
+        else:
+            db_task.reminder_time = None
+
+        # Reset reminder/overdue tracking when values change
+        if db_task.reminder_time != old_reminder_time:
+            db_task.last_reminder_sent = None
+        if 'due_date' in update_data and db_task.due_date != old_due_date:
+            db_task.last_overdue_notification_sent = None
 
     db_task.updated_at = datetime.utcnow()
 
@@ -359,3 +408,184 @@ def get_user_conversations(
         })
 
     return conversations
+
+
+# ============================================================================
+# Notification CRUD Operations (Phase VI: Task Reminders & Notifications)
+# ============================================================================
+
+
+def get_notifications(
+    session: Session,
+    user_id: int,
+    is_read: Optional[bool] = None,
+    type: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0
+) -> List[Notification]:
+    """
+    Get user's notifications with optional filtering.
+
+    Args:
+        session: Database session
+        user_id: User ID
+        is_read: Filter by read status (optional)
+        type: Filter by notification type (optional)
+        limit: Maximum notifications to return
+        offset: Number to skip
+
+    Returns:
+        List of Notification objects sorted by created_at descending
+    """
+    query = select(Notification).where(Notification.user_id == user_id)
+
+    if is_read is not None:
+        query = query.where(Notification.is_read == is_read)
+
+    if type:
+        query = query.where(Notification.type == type)
+
+    query = query.order_by(Notification.created_at.desc()).limit(limit).offset(offset)
+
+    result = session.execute(query)
+    return list(result.scalars().all())
+
+
+def get_unread_count(session: Session, user_id: int) -> int:
+    """
+    Get count of unread notifications for a user.
+
+    Args:
+        session: Database session
+        user_id: User ID
+
+    Returns:
+        Count of unread notifications
+    """
+    query = select(func.count()).select_from(Notification).where(
+        Notification.user_id == user_id,
+        Notification.is_read == False
+    )
+
+    result = session.execute(query)
+    return result.scalar_one()
+
+
+def mark_notification_as_read(
+    session: Session,
+    notification_id: int,
+    user_id: int
+) -> Optional[Notification]:
+    """
+    Mark a notification as read.
+
+    Args:
+        session: Database session
+        notification_id: Notification ID
+        user_id: User ID (for authorization)
+
+    Returns:
+        Updated Notification object if found and authorized, None otherwise
+    """
+    notification = session.exec(
+        select(Notification).where(
+            Notification.id == notification_id,
+            Notification.user_id == user_id
+        )
+    ).first()
+
+    if not notification:
+        return None
+
+    notification.is_read = True
+    session.add(notification)
+    session.commit()
+    session.refresh(notification)
+
+    return notification
+
+
+def mark_all_notifications_as_read(session: Session, user_id: int) -> int:
+    """
+    Mark all user's notifications as read.
+
+    Args:
+        session: Database session
+        user_id: User ID
+
+    Returns:
+        Count of notifications updated
+    """
+    notifications = session.exec(
+        select(Notification).where(
+            Notification.user_id == user_id,
+            Notification.is_read == False
+        )
+    ).all()
+
+    count = 0
+    for notification in notifications:
+        notification.is_read = True
+        session.add(notification)
+        count += 1
+
+    session.commit()
+    return count
+
+
+def delete_notification(
+    session: Session,
+    notification_id: int,
+    user_id: int
+) -> bool:
+    """
+    Delete a notification.
+
+    Args:
+        session: Database session
+        notification_id: Notification ID
+        user_id: User ID (for authorization)
+
+    Returns:
+        True if deleted, False if not found or unauthorized
+    """
+    notification = session.exec(
+        select(Notification).where(
+            Notification.id == notification_id,
+            Notification.user_id == user_id
+        )
+    ).first()
+
+    if not notification:
+        return False
+
+    session.delete(notification)
+    session.commit()
+    return True
+
+
+def delete_read_notifications(session: Session, user_id: int) -> int:
+    """
+    Delete all read notifications for a user.
+
+    Args:
+        session: Database session
+        user_id: User ID
+
+    Returns:
+        Count of notifications deleted
+    """
+    notifications = session.exec(
+        select(Notification).where(
+            Notification.user_id == user_id,
+            Notification.is_read == True
+        )
+    ).all()
+
+    count = 0
+    for notification in notifications:
+        session.delete(notification)
+        count += 1
+
+    session.commit()
+    return count

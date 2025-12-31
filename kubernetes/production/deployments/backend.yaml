@@ -7,7 +7,7 @@ metadata:
     app: todo-backend
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: todo-backend
@@ -38,6 +38,16 @@ spec:
             configMapKeyRef:
               name: app-config
               key: LOG_LEVEL
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: CORS_ORIGINS
+        - name: FROM_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FROM_EMAIL
 
         # From Secrets
         - name: DATABASE_URL

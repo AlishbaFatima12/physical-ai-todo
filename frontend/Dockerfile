@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies with clean cache
-RUN npm ci --only=production --omit=dev
+RUN npm ci
 
 # ===================================
 # Stage 2: Builder
