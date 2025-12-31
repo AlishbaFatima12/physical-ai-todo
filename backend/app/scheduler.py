@@ -5,6 +5,7 @@ Uses APScheduler to run periodic checks every 60 seconds.
 """
 
 import logging
+import sys
 from datetime import datetime
 from typing import Optional
 
@@ -16,7 +17,15 @@ from app.database import engine
 from app.models import Task, Notification
 from app.email_service import send_reminder_email, send_overdue_email
 
+# Configure logging to ensure scheduler logs appear
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s:     %(message)s',
+    stream=sys.stdout,
+    force=True
+)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Initialize scheduler
 scheduler = AsyncIOScheduler()
