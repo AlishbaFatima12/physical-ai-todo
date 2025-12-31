@@ -21,7 +21,7 @@ spec:
       - name: regcred
       containers:
       - name: frontend
-        image: registry.digitalocean.com/physical-ai-todo-registry/todo-frontend:latest
+        image: registry.digitalocean.com/physical-ai-todo-registry/todo-frontend:frontend
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
