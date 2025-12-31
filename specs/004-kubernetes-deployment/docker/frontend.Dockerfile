@@ -30,7 +30,7 @@ COPY frontend/ .
 # Using custom subdomain for better branding
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
-    NEXT_PUBLIC_API_URL=http://alishba-ai-todo.161-35-250-151.nip.io/api/v1
+    NEXT_PUBLIC_API_URL=http://161-35-250-151.nip.io/api/v1
 
 # Build Next.js app (standalone output for smaller image)
 RUN npm run build
