@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-✅_Production-brightgreen?style=flat-square" alt="Status"/>
-  <img src="https://img.shields.io/badge/Phase-V_Complete-blue?style=flat-square" alt="Phase"/>
+  <img src="https://img.shields.io/badge/Phase-VI_Complete-blue?style=flat-square" alt="Phase"/>
   <img src="https://img.shields.io/badge/Deployment-Kubernetes-326CE5?style=flat-square&logo=kubernetes" alt="Kubernetes"/>
   <img src="https://img.shields.io/badge/Cloud-DigitalOcean-0080FF?style=flat-square&logo=digitalocean" alt="DigitalOcean"/>
 </p>
@@ -111,6 +111,11 @@ Works in 6 languages with full RTL support:
 ✅ Search and filter tasks
 ✅ Subtasks with parent-child relationships
 ✅ Task notes and attachments
+✅ **Task reminders with custom times** ⭐ NEW
+✅ **In-app notifications with bell icon** ⭐ NEW
+✅ **Email reminders via Gmail SMTP** ⭐ NEW
+✅ **Real-time toast notifications** ⭐ NEW
+✅ **Background reminder checker (60s intervals)** ⭐ NEW
 
 ### **AI Chatbot** ⭐
 🤖 Natural language task creation
@@ -199,7 +204,8 @@ Works in 6 languages with full RTL support:
 - **Database:** Neon Serverless PostgreSQL
 - **Authentication:** JWT (httpOnly cookies)
 - **AI:** OpenAI GPT-4
-- **Email:** Resend API
+- **Email:** Gmail SMTP (for reminders) + Resend API
+- **Scheduler:** APScheduler (background reminders)
 
 ### **Infrastructure**
 - **Container:** Docker
@@ -297,6 +303,18 @@ Visit: http://localhost:3001
 
 The AI understands natural language and helps you manage tasks!
 
+### Using Task Reminders ⭐ NEW
+
+1. **Create a task** on the dashboard
+2. **Set a reminder time** using the date/time picker
+3. **Get notifications** when the reminder time arrives:
+   - 🔔 In-app notification (bell icon)
+   - 📧 Email notification to your inbox
+   - 🎉 Toast popup on the screen
+4. **View all notifications** by clicking the bell icon
+
+Reminders are checked every 60 seconds in the background!
+
 ---
 
 ## 📊 API Documentation
@@ -313,9 +331,14 @@ The AI understands natural language and helps you manage tasks!
 
 **Tasks:**
 - `GET /api/v1/tasks` - List all tasks
-- `POST /api/v1/tasks` - Create task
+- `POST /api/v1/tasks` - Create task (with optional reminder_time)
 - `PUT /api/v1/tasks/{id}` - Update task
 - `DELETE /api/v1/tasks/{id}` - Delete task
+
+**Notifications:** ⭐ NEW
+- `GET /api/v1/notifications` - Get user notifications
+- `PUT /api/v1/notifications/{id}/read` - Mark notification as read
+- `DELETE /api/v1/notifications/{id}` - Delete notification
 
 **AI Chat:**
 - `POST /api/v1/chat` - Send message to AI
@@ -354,6 +377,16 @@ The AI understands natural language and helps you manage tasks!
 - Nginx ingress
 - Production-grade infrastructure
 - 24/7 availability
+
+### ✅ Phase VI: Task Reminders & Notifications (Complete) ⭐ NEW
+- 🔔 In-app notification system
+- ⏰ Task reminder scheduling
+- 📧 Email notifications via Gmail SMTP
+- 🎉 Real-time toast popups
+- 🔄 Background reminder checker (APScheduler)
+- 💾 Persistent notifications in database
+- ✉️ Multi-user email support
+- 🎯 Reminder-based notification triggers
 
 ---
 
@@ -409,12 +442,13 @@ This is a portfolio project demonstrating modern full-stack development with:
 
 ## 📈 Project Stats
 
-- **Lines of Code:** 15,000+
+- **Lines of Code:** 16,000+
 - **Languages:** TypeScript, Python
-- **Commits:** 100+
-- **Development Time:** 6 weeks
-- **Features Implemented:** 35+
+- **Commits:** 120+
+- **Development Time:** 7 weeks
+- **Features Implemented:** 40+
 - **Test Coverage:** 80%+
+- **Phases Completed:** 6/6 ✅
 
 ---
 
@@ -567,8 +601,8 @@ Built with:
   <a href="http://161-35-250-151.nip.io"><img src="https://img.shields.io/badge/🚀_Try_Live_Demo-success?style=for-the-badge" alt="Demo"/></a>
 </p>
 
-**Last Updated:** December 22, 2024
-**Version:** 1.0.0 (Phase V - Production)
+**Last Updated:** December 31, 2024
+**Version:** 1.1.0 (Phase VI - Notifications & Reminders)
 **Status:** ✅ Live in Production
 
 </div>

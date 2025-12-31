@@ -1,0 +1,37 @@
+# Exclude node_modules (installed fresh in container)
+node_modules
+**/node_modules
+
+# Exclude Python cache
+__pycache__
+**/__pycache__
+**/*.pyc
+
+# Exclude build outputs
+.next
+frontend/.next
+frontend/out
+frontend/build
+
+# Exclude git
+.git
+.gitignore
+.github
+
+# Exclude IDE
+.vscode
+.idea
+
+# Exclude environment files
+.env
+.env.local
+.env*.local
+
+# Exclude Kubernetes configs
+kubernetes
+kubeconfig*.yaml
+
+# Exclude test and development scripts
+*.cmd
+*.ps1
+*.md
