@@ -1,61 +1,37 @@
-# Node modules (will be installed in container)
-**/node_modules/
-**/__pycache__/
+# Exclude node_modules (installed fresh in container)
+node_modules
+**/node_modules
+
+# Exclude Python cache
+__pycache__
+**/__pycache__
 **/*.pyc
 
-# Build outputs
-frontend/.next/
-frontend/out/
-frontend/build/
-backend/.pytest_cache/
-backend/.mypy_cache/
+# Exclude build outputs
+.next
+frontend/.next
+frontend/out
+frontend/build
 
-# Git
-.git/
+# Exclude git
+.git
 .gitignore
-.github/
+.github
 
-# IDE
-.vscode/
-.idea/
-**/*.swp
-**/*.swo
+# Exclude IDE
+.vscode
+.idea
 
-# OS files
-.DS_Store
-Thumbs.db
-**/.DS_Store
-**/Thumbs.db
-
-# Environment files (secrets)
-**/.env*.local
+# Exclude environment files
 .env
+.env.local
+.env*.local
 
-# Documentation
-*.md
-!frontend/README.md
-!backend/README.md
-
-# Kubernetes configs (not needed in images)
-kubernetes/
+# Exclude Kubernetes configs
+kubernetes
 kubeconfig*.yaml
 
-# Test files and scripts
-**/*test*.py
-**/*test*.ts
-**/*test*.tsx
-**/*.spec.ts
-**/*.spec.tsx
+# Exclude test and development scripts
 *.cmd
 *.ps1
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Misc
-.dockerignore
-Dockerfile
-**/Dockerfile
+*.md
