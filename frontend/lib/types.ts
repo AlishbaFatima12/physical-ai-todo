@@ -6,6 +6,8 @@ export type Priority = 'low' | 'medium' | 'high'
 
 export type ActionType = 'created' | 'updated' | 'completed' | 'deleted' | 'restored'
 
+export type ReminderOffset = '1h' | '1d' | '3d' | '5d' | '1w' | null
+
 export interface Task {
   id: number
   title: string
@@ -17,6 +19,9 @@ export interface Task {
   is_template: boolean
   created_at: string
   updated_at: string
+  due_date?: string  // ISO 8601 datetime string
+  reminder_offset?: ReminderOffset
+  reminder_time?: string  // ISO 8601 datetime string (calculated by backend)
   subtasks?: Subtask[]
   notes?: Note[]
   attachments?: Attachment[]
@@ -91,6 +96,17 @@ export interface ChatMessage {
   created_at: string
 }
 
+export interface Notification {
+  id: number
+  user_id: number
+  task_id: number
+  type: 'reminder' | 'overdue' | 'task_created' | 'task_completed' | 'task_updated' | 'task_deleted' | 'task_reopened'
+  title: string
+  message: string
+  is_read: boolean
+  created_at: string
+}
+
 // Request types
 export interface TaskCreate {
   title: string
@@ -98,6 +114,8 @@ export interface TaskCreate {
   priority?: Priority
   tags?: string[]  // Array of tag strings
   display_order?: number
+  due_date?: string  // ISO 8601 datetime string
+  reminder_offset?: ReminderOffset
 }
 
 export interface TaskUpdate {
@@ -107,6 +125,8 @@ export interface TaskUpdate {
   priority?: Priority
   tags?: string[]  // Array of tag strings
   display_order?: number
+  due_date?: string  // ISO 8601 datetime string
+  reminder_offset?: ReminderOffset
 }
 
 export interface SubtaskCreate {

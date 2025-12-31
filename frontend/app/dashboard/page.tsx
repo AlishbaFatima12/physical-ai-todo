@@ -8,6 +8,7 @@ import TaskList from '@/components/TaskList'
 import FilterBar from '@/components/FilterBar'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import NotificationDropdown from '@/components/NotificationDropdown'
 import { Task } from '@/lib/types'
 import { useI18n } from '@/contexts/I18nContext'
 
@@ -71,16 +72,9 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="text-center flex-grow">
-            <h1 className="text-5xl font-bold text-white mb-2">
-              {t('app.title')}
-            </h1>
-            <p className="text-white text-opacity-90">
-              {t('app.subtitle')}
-            </p>
-          </div>
-          <div className="absolute top-6 right-6 flex items-center gap-3">
+        <div className="mb-8">
+          {/* Top Navigation Bar */}
+          <div className="flex items-center justify-end gap-3 mb-6">
             {/* AI Chat Button */}
             <a
               href="/chat"
@@ -101,6 +95,9 @@ export default function Home() {
                 />
               </svg>
             </a>
+
+            {/* Notification Dropdown - NO wrapper to avoid stacking context */}
+            <NotificationDropdown />
 
             {/* Logout Button */}
             <button
@@ -128,6 +125,16 @@ export default function Home() {
 
             <LanguageSwitcher />
             <ThemeToggle />
+          </div>
+
+          {/* Title Section */}
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-white mb-2">
+              {t('app.title')}
+            </h1>
+            <p className="text-white text-opacity-90">
+              {t('app.subtitle')}
+            </p>
           </div>
         </div>
 
@@ -218,7 +225,7 @@ export default function Home() {
         <div className="mt-8 text-center text-white text-opacity-75 text-sm">
           <p>
             Backend: <code className="bg-white bg-opacity-20 px-2 py-1 rounded">
-              http://localhost:8000
+              {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}
             </code>
           </p>
         </div>
