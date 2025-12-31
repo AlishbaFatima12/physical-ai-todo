@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Task, TaskCreate, Priority } from '@/lib/types'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { Task, TaskCreate, Priority, ReminderOffset } from '@/lib/types'
 import { createTask, updateTask } from '@/lib/api'
 import { useI18n } from '@/contexts/I18nContext'
 
@@ -18,6 +20,8 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
   const [priority, setPriority] = useState<Priority>('medium')
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
+  const [dueDate, setDueDate] = useState<Date | null>(null)
+  const [reminderOffset, setReminderOffset] = useState<ReminderOffset>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -26,6 +30,8 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
       setDescription(editingTask.description || '')
       setPriority(editingTask.priority)
       setTags(editingTask.tags || [])
+      setDueDate(editingTask.due_date ? new Date(editingTask.due_date) : null)
+      setReminderOffset(editingTask.reminder_offset || null)
     }
   }, [editingTask])
 
@@ -39,6 +45,23 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
 
   const handleRemoveTag = (tag: string) => {
     setTags(tags.filter((t) => t !== tag))
+  }
+
+  // Calculate if reminder offset is valid based on due date
+  const isOffsetValid = (offset: ReminderOffset): boolean => {
+    if (!dueDate || !offset) return true
+
+    const now = new Date()
+    const offsetMs: Record<string, number> = {
+      '1h': 60 * 60 * 1000,
+      '1d': 24 * 60 * 60 * 1000,
+      '3d': 3 * 24 * 60 * 60 * 1000,
+      '5d': 5 * 24 * 60 * 60 * 1000,
+      '1w': 7 * 24 * 60 * 60 * 1000,
+    }
+
+    const reminderTime = dueDate.getTime() - (offsetMs[offset] || 0)
+    return reminderTime > now.getTime()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +83,8 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
           priority,
           tags,
           completed: editingTask.completed,
+          due_date: dueDate ? dueDate.toISOString() : undefined,
+          reminder_offset: reminderOffset || undefined,
         })
       } else {
         // Create new task
@@ -68,6 +93,8 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
           description: description.trim(),
           priority,
           tags,
+          due_date: dueDate ? dueDate.toISOString() : undefined,
+          reminder_offset: reminderOffset || undefined,
         }
         await createTask(taskData)
       }
@@ -78,6 +105,8 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
       setPriority('medium')
       setTags([])
       setTagInput('')
+      setDueDate(null)
+      setReminderOffset(null)
 
       onSuccess()
     } catch (error) {
@@ -195,6 +224,63 @@ export default function TaskForm({ onSuccess, onCancel, editingTask }: TaskFormP
             </div>
           )}
         </div>
+
+        {/* Due Date */}
+        <div>
+          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+            Due Date & Time
+          </label>
+          <DatePicker
+            selected={dueDate}
+            onChange={(date) => {
+              setDueDate(date)
+              // Reset reminder offset if due date is cleared or changes
+              if (!date || (reminderOffset && !isOffsetValid(reminderOffset))) {
+                setReminderOffset(null)
+              }
+            }}
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="MMMM d, yyyy h:mm aa"
+            minDate={new Date()}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            placeholderText="Select due date and time"
+            isClearable
+          />
+        </div>
+
+        {/* Reminder Offset (only visible when due date is set) */}
+        {dueDate && (
+          <div>
+            <label htmlFor="reminderOffset" className="block text-sm font-medium text-gray-700 mb-1">
+              Reminder
+            </label>
+            <select
+              id="reminderOffset"
+              value={reminderOffset || ''}
+              onChange={(e) => setReminderOffset(e.target.value as ReminderOffset || null)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            >
+              <option value="">Never</option>
+              <option value="1h" disabled={!isOffsetValid('1h')}>
+                1 hour before {!isOffsetValid('1h') && '(too soon)'}
+              </option>
+              <option value="1d" disabled={!isOffsetValid('1d')}>
+                1 day before {!isOffsetValid('1d') && '(too soon)'}
+              </option>
+              <option value="3d" disabled={!isOffsetValid('3d')}>
+                3 days before {!isOffsetValid('3d') && '(too soon)'}
+              </option>
+              <option value="5d" disabled={!isOffsetValid('5d')}>
+                5 days before {!isOffsetValid('5d') && '(too soon)'}
+              </option>
+              <option value="1w" disabled={!isOffsetValid('1w')}>
+                1 week before {!isOffsetValid('1w') && '(too soon)'}
+              </option>
+            </select>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">

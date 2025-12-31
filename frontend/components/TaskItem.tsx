@@ -138,6 +138,46 @@ export default function TaskItem({ task, onUpdate, onEdit }: TaskItemProps) {
             </div>
           )}
 
+          {/* Due Date Badge and Reminder Indicator */}
+          {task.due_date && (
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {(() => {
+                const dueDate = new Date(task.due_date)
+                const now = new Date()
+                const isOverdue = dueDate < now && !task.completed
+
+                return (
+                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border ${
+                    isOverdue
+                      ? 'bg-red-100 text-red-800 border-red-300'
+                      : 'bg-orange-100 text-orange-800 border-orange-300'
+                  }`}>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {isOverdue ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      )}
+                    </svg>
+                    {isOverdue ? 'Overdue' : 'Due'}: {formatDate(task.due_date)}
+                  </span>
+                )
+              })()}
+              {task.reminder_offset && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800 border border-purple-300" title="Reminder set">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  {task.reminder_offset === '1h' && '1h before'}
+                  {task.reminder_offset === '1d' && '1d before'}
+                  {task.reminder_offset === '3d' && '3d before'}
+                  {task.reminder_offset === '5d' && '5d before'}
+                  {task.reminder_offset === '1w' && '1w before'}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Dates */}
           <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-2">
             <span title={t('taskItem.created')}>

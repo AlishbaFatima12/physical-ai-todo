@@ -136,6 +136,11 @@ export default function ChatPage() {
 
       // Reload tasks after AI action
       await loadTasks();
+
+      // Trigger notification refresh for instant notification updates
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('refreshNotifications'));
+      }
     } catch (error: any) {
       console.error("Chat error:", error);
       setMessages((prev) => [

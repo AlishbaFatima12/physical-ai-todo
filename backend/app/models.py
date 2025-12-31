@@ -59,6 +59,14 @@ class User(SQLModel, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Task.user_id]"},
     )
 
+    notifications: List["Notification"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={
+            "foreign_keys": "[Notification.user_id]",
+            "cascade": "all, delete-orphan",
+        },
+    )
+
 
 # ============================
 # Task
@@ -84,9 +92,12 @@ class Task(SQLModel, table=True):
         sa_column=Column(JSON),
     )
 
-    # Phase V
+    # Phase V - Reminders and Notifications
     due_date: Optional[datetime] = Field(default=None, index=True)
+    reminder_offset: Optional[str] = Field(default=None, max_length=10)  # "1h", "1d", "3d", "5d", "1w", or None
     reminder_time: Optional[datetime] = Field(default=None, index=True)
+    last_reminder_sent: Optional[datetime] = Field(default=None)
+    last_overdue_notification_sent: Optional[datetime] = Field(default=None)
 
     is_recurring: bool = Field(default=False, index=True)
     recurrence_pattern: Optional[str] = Field(default=None, max_length=50)
@@ -119,6 +130,14 @@ class Task(SQLModel, table=True):
     activity_logs: List["ActivityLog"] = Relationship(
         back_populates="task",
         sa_relationship_kwargs={"foreign_keys": "[ActivityLog.task_id]"},
+    )
+
+    notifications: List["Notification"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={
+            "foreign_keys": "[Notification.task_id]",
+            "cascade": "all, delete-orphan",
+        },
     )
 
 
@@ -230,6 +249,31 @@ class ActivityLog(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
 
     task: Optional[Task] = Relationship(back_populates="activity_logs")
+
+
+# ============================
+# Notification
+# ============================
+
+
+class Notification(SQLModel, table=True):
+    """In-app notification model for task reminders and overdue alerts"""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    user_id: int = Field(foreign_key="user.id", index=True)
+    task_id: int = Field(foreign_key="task.id", index=True)
+
+    type: str = Field(max_length=50)  # "reminder" or "overdue"
+    title: str = Field(max_length=200)
+    message: str = Field(max_length=500)
+
+    is_read: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+    # Relationships
+    user: Optional[User] = Relationship(back_populates="notifications")
+    task: Optional[Task] = Relationship(back_populates="notifications")
 
 
 # ============================
