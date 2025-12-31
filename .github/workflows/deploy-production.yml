@@ -30,22 +30,18 @@ jobs:
       - name: Build Backend Docker Image
         run: |
           docker build -f specs/004-kubernetes-deployment/docker/backend.Dockerfile \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend-${{ github.sha }} \
             -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend \
             .
 
       - name: Build Frontend Docker Image
         run: |
           docker build -f specs/004-kubernetes-deployment/docker/frontend.Dockerfile \
-            -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend-${{ github.sha }} \
             -t ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend \
             .
 
       - name: Push Images to Registry
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend-${{ github.sha }}
           docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:backend
-          docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend-${{ github.sha }}
           docker push ${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}/todo-frontend:frontend
 
       - name: Update kubeconfig
